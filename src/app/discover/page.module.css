@@ -1,0 +1,547 @@
+/* モバイルファーストのマッチングアプリUI */
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* モダンヘッダー */
+.modernHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo {
+  font-size: 1.8rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.appTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filterButton {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background: rgba(102, 126, 234, 0.1);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1.2rem;
+}
+
+.filterButton:active {
+  background: rgba(102, 126, 234, 0.2);
+  transform: scale(0.95);
+}
+
+/* カードスタック */
+.cardStackContainer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  position: relative;
+  min-height: 0;
+}
+
+.cardStack {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  height: calc(100vh - 200px);
+  max-height: 600px;
+  perspective: 1000px;
+}
+
+.backgroundCard {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  transform: scale(0.95) translateY(8px);
+  z-index: 1;
+}
+
+.mainCard {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  transition: transform 0.15s ease-out;
+  touch-action: none;
+}
+
+.cardSlide {
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+  background: white;
+}
+
+.cardImageContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #f8f9fa;
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* スワイプインジケーター */
+.swipeIndicator {
+  position: absolute;
+  top: 40px;
+  font-size: 1.5rem;
+  font-weight: 900;
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: 3px solid;
+  background: rgba(255, 255, 255, 0.95);
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.15s ease;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.swipeIndicator.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.passIndicator {
+  left: 16px;
+  color: #ff4458;
+  border-color: #ff4458;
+  transform: rotate(-15deg) scale(0.8);
+}
+
+.passIndicator.visible {
+  transform: rotate(-15deg) scale(1);
+}
+
+.likeIndicator {
+  right: 16px;
+  color: #66d7d2;
+  border-color: #66d7d2;
+  transform: rotate(15deg) scale(0.8);
+}
+
+.likeIndicator.visible {
+  transform: rotate(15deg) scale(1);
+}
+
+/* カード情報オーバーレイ */
+.cardOverlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  padding: 60px 20px 20px;
+  color: white;
+}
+
+.restaurantBadge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 6px 12px;
+  z-index: 5;
+}
+
+.badgeText {
+  color: #333;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.cardInfo {
+  margin-top: 12px;
+}
+
+.restaurantName {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  line-height: 1.3;
+}
+
+.restaurantDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detailItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+}
+
+.detailIcon {
+  font-size: 0.9rem;
+  width: 16px;
+  text-align: center;
+}
+
+.detailText {
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.3;
+}
+
+.catchPhrase {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* アクションボタン */
+.actionButtons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 16px 16px;
+  position: relative;
+  z-index: 10;
+}
+
+.actionButton {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  transition: all 0.15s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  position: relative;
+  background: white;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.actionButton:active:not(:disabled) {
+  transform: scale(0.9);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.actionButton:disabled {
+  opacity: 0.5;
+  transform: none;
+}
+
+.passButton {
+  background: linear-gradient(135deg, #ff4458 0%, #ff6b7d 100%);
+}
+
+.passButton .actionIcon {
+  color: white;
+  font-weight: 900;
+  font-size: 1.5rem;
+}
+
+.superlikeButton {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #4ecdc4 0%, #66d7d2 100%);
+}
+
+.superlikeButton .actionIcon {
+  color: white;
+  font-size: 1.1rem;
+}
+
+.likeButton {
+  background: linear-gradient(135deg, #a8e6cf 0%, #66d7d2 100%);
+}
+
+.likeButton .actionIcon {
+  color: white;
+  font-size: 1.4rem;
+}
+
+/* プログレスインジケーター */
+.progressContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.progressBar {
+  flex: 1;
+  max-width: 150px;
+  height: 3px;
+  background: rgba(102, 126, 234, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.progressText {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #333;
+  min-width: 40px;
+  text-align: center;
+}
+
+/* ローディング状態 */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 20px;
+  color: white;
+  padding: 40px 20px;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top: 3px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loadingText {
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: center;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* エラー・空状態 */
+.errorContainer,
+.emptyContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 20px;
+  color: white;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.errorIcon,
+.emptyIcon {
+  font-size: 3rem;
+  opacity: 0.8;
+}
+
+.errorTitle,
+.emptyTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  color: white;
+  line-height: 1.3;
+}
+
+.errorMessage,
+.emptyMessage {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.modernRetryButton {
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #333;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  backdrop-filter: blur(10px);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.modernRetryButton:active {
+  background: white;
+  transform: scale(0.95);
+}
+
+/* スワイプアニメーション */
+.swipeLeft {
+  animation: swipeLeftOut 0.3s ease-out forwards;
+}
+
+.swipeRight {
+  animation: swipeRightOut 0.3s ease-out forwards;
+}
+
+.swipeUp {
+  animation: swipeUpOut 0.3s ease-out forwards;
+}
+
+@keyframes swipeLeftOut {
+  to {
+    transform: translateX(-100vw) rotate(-30deg);
+    opacity: 0;
+  }
+}
+
+@keyframes swipeRightOut {
+  to {
+    transform: translateX(100vw) rotate(30deg);
+    opacity: 0;
+  }
+}
+
+@keyframes swipeUpOut {
+  to {
+    transform: translateY(-100vh) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* 極小画面対応 */
+@media (max-width: 360px) {
+  .modernHeader {
+    padding: 10px 16px;
+  }
+  
+  .appTitle {
+    font-size: 1.1rem;
+  }
+  
+  .logo {
+    font-size: 1.6rem;
+  }
+  
+  .cardStack {
+    max-width: 300px;
+    height: calc(100vh - 180px);
+  }
+  
+  .cardStackContainer {
+    padding: 12px;
+  }
+  
+  .restaurantName {
+    font-size: 1.1rem;
+  }
+  
+  .actionButtons {
+    gap: 16px;
+    padding: 16px 12px 12px;
+  }
+  
+  .actionButton {
+    width: 50px;
+    height: 50px;
+    font-size: 1.1rem;
+  }
+  
+  .superlikeButton {
+    width: 42px;
+    height: 42px;
+  }
+  
+  .progressContainer {
+    padding: 10px 16px;
+  }
+  
+  .progressText {
+    font-size: 0.75rem;
+  }
+}
+
+/* iPhone SE対応 */
+@media (max-height: 670px) {
+  .cardStack {
+    height: calc(100vh - 160px);
+    max-height: 480px;
+  }
+  
+  .actionButtons {
+    padding: 16px;
+  }
+}

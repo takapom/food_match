@@ -1,0 +1,57 @@
+.userIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.iconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  color: white;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.userIcon:hover .iconContainer {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.icon {
+  width: 60%;
+  height: 60%;
+}
+
+/* サイズバリエーション */
+.small .iconContainer {
+  width: 32px;
+  height: 32px;
+}
+
+.medium .iconContainer {
+  width: 40px;
+  height: 40px;
+}
+
+.large .iconContainer {
+  width: 48px;
+  height: 48px;
+}
+
+@media (max-width: 768px) {
+  .medium .iconContainer {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .large .iconContainer {
+    width: 40px;
+    height: 40px;
+  }
+}

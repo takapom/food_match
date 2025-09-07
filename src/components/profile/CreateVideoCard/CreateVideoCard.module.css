@@ -1,0 +1,47 @@
+.createCard {
+  position: fixed;
+  bottom: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 131px;
+  height: 100px;
+  background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 5;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.createCard:hover {
+  transform: translateX(-50%) scale(1.05);
+}
+
+.createCard:active {
+  transform: translateX(-50%) scale(0.95);
+}
+
+.content {
+  text-align: center;
+}
+
+.title {
+  font-family: 'Proxima Nova', -apple-system, system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.50px;
+  color: #000000;
+  margin-bottom: 2px;
+}
+
+.subtitle {
+  font-family: 'Proxima Nova', -apple-system, system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.50px;
+  color: #000000;
+}

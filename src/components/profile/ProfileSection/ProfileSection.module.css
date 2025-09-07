@@ -1,0 +1,72 @@
+.profileSection {
+  padding: 16px 22px 32px;
+  background: white;
+  box-shadow: 0px 0.33px 0px #d0d1d3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.avatarContainer {
+  margin-bottom: 16px;
+}
+
+.avatar {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.username {
+  font-family: 'Proxima Nova', -apple-system, system-ui, sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: #161722;
+  margin-bottom: 8px;
+}
+
+.actionButtons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.editButton {
+  background: transparent !important;
+  border: 1px solid #161722 !important;
+  color: #000000 !important;
+  font-family: 'Proxima Nova', -apple-system, system-ui, sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  padding: 8px 24px !important;
+  border-radius: 4px !important;
+}
+
+.editButton:hover {
+  background: #f8f9fa !important;
+}
+
+.bookmarkButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bookmarkButton:hover {
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.bioPlaceholder {
+  font-family: 'Proxima Nova', -apple-system, system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #86878b;
+  cursor: pointer;
+}

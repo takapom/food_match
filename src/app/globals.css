@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Proxima+Nova:wght@400;600;700&display=swap');
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  
+  /* Profile page specific colors */
+  --profile-bg: #ffffff;
+  --profile-text-primary: #161722;
+  --profile-text-secondary: #86878b;
+  --profile-stats-text: #161722;
+  --profile-border: #d0d1d3;
+  --profile-button-bg: transparent;
+  --profile-button-border: #161722;
+  --profile-button-text: #000000;
+  
+  /* Navigation colors */
+  --nav-bg: #ffffff;
+  --nav-text-active: #161722;
+  --nav-text-inactive: #8a8b8f;
+  --nav-icon-active: #161722;
+  --nav-icon-inactive: #8a8b8f;
+  --nav-border: #d0d1d3;
+  
+  /* Status bar colors */
+  --status-text: #171717;
+  --status-icon: #060606;
+  
+  /* Create video card */
+  --create-card-text: #000000;
+  --create-card-bg: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  padding: 0;
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+input, textarea, select {
+  font-family: inherit;
+}

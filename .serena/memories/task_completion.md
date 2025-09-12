@@ -1,0 +1,12 @@
+When finishing a task
+- Run format/lint:
+  - Frontend: `npm run lint`
+  - Backend: `go fmt ./...` and `golangci-lint run` (if configured; otherwise skip)
+- Run or rebuild services:
+  - Backend: `docker compose up -d --build` and `docker compose logs -f app`
+- Smoke tests:
+  - `curl http://localhost:8080/api/health` should return OK
+  - If JWT flows touched, POST /api/login and GET /api/protected with Bearer token
+- Update docs:
+  - If behavior/config changed, update `backend/README_DOCKER.md` or root README.
+- Open a short PR description with rationale and steps to verify.

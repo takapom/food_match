@@ -31,6 +31,8 @@ export default function Discover() {
 
             const data = await response.json();
 
+            console.log("data：", data)
+
             if (data.error) {
                 throw new Error(data.message || 'データの取得に失敗しました');
             }
@@ -220,7 +222,7 @@ export default function Discover() {
                     <h2 className={styles.emptyTitle}>お店が見つかりませんでした</h2>
                     <p className={styles.emptyMessage}>別のエリアで探してみましょう</p>
                     <button onClick={handleReload} className={styles.modernRetryButton}>
-                        新しいお店を探す
+                        読み込む
                     </button>
                 </div>
             </div>

@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 
 	"go-qr-app/domain/model"
 	"go-qr-app/handler"
@@ -88,12 +89,17 @@ func main() {
 	authHandler := handler.NewAuthHandler(jwtIssuer, authUC)
 	//こいつはJWTを認証するためのobject
 	authMiddleware := middleware.NewAuthMiddleware(jwtIssuer)
+	// user handler (requires repository)
+	userHandler := handler.NewUserHandler(userRepo)
 
 	// ルーティング設定→Listenした後にこれが発火してユーザーからのリクエストを割り振ることができる
 	mux := http.NewServeMux()
 
 	// ログインエンドポイント（認証不要）
 	mux.HandleFunc("/api/login", authHandler.Login)
+
+	// プロフィール取得/更新（認証必須）
+	mux.HandleFunc("/api/user/profile", authMiddleware.Authenticate(userHandler.Profile))
 
 	mux.HandleFunc("/api/register", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
@@ -111,6 +117,7 @@ func main() {
 			return
 		}
 
+		//usecaseのメソッド使用
 		user, err := authUC.Register(req.DisplayName, req.Email, req.Password)
 		if err != nil {
 			if err == model.ErrEmailAlreadyUsed {
@@ -137,6 +144,14 @@ func main() {
 		w.Write([]byte(`{"message": "This is protected endpoint", "user_id": "` + userID + `"}`))
 	}))
 
+	//cors設定→CORSをmuxでラップしてlistenする
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000"}, // フロントエンドのURL
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Authorization", "Content-Type"},
+		AllowCredentials: true,
+	}).Handler(mux)
+
 	// サーバー起動
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -149,7 +164,7 @@ func main() {
 	log.Println("  GET /api/protected - Protected endpoint (requires Bearer token)")
 	log.Println("  GET /api/health - Health check")
 
-	if err := http.ListenAndServe(":"+port, mux); err != nil {
+	if err := http.ListenAndServe(":"+port, corsHandler); err != nil {
 		log.Fatal(err)
 	}
 }

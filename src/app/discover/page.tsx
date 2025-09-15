@@ -4,8 +4,15 @@ import { useEffect, useState, useRef } from 'react';
 import { type Shop } from '@/lib/api/restaurants';
 import UserIcon from '@/components/ui/UserIcon/UserIcon';
 import styles from './page.module.css';
+import { useRouter } from 'next/navigation';
 
 export default function Discover() {
+
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
+    const AUTH_COOKIE_NAME = process.env.NEXT_PUBLIC_AUTH_COOKIE_NAME || 'auth_token';
+    const TOKEN_EXPIRY_HOURS = Number(process.env.NEXT_PUBLIC_AUTH_TOKEN_HOURS || '12');
+    const COOKIE_MAX_AGE_MS = TOKEN_EXPIRY_HOURS * 60 * 60 * 1000;
+
     const [restaurants, setRestaurants] = useState<Shop[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -15,10 +22,25 @@ export default function Discover() {
     const [translateX, setTranslateX] = useState(0);
     const [isAnimating, setIsAnimating] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
+    const router = useRouter();
+
+    function getAuthTokenFromCookie(): string | null {
+        if (typeof document === 'undefined') return null;
+        const match = document.cookie.match(new RegExp(`(?:^|; )${AUTH_COOKIE_NAME}=([^;]*)`));
+        return match ? decodeURIComponent(match[1]) : null;
+    }
 
     useEffect(() => {
         loadRestaurants();
     }, []);
+
+    useEffect(() => {
+        const existing_token = getAuthTokenFromCookie()
+        if (!existing_token) {
+            router.push("/login")
+        }
+    }, []);
+
 
     const loadRestaurants = async () => {
         try {

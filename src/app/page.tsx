@@ -49,7 +49,7 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <div className={styles.backgroundBlur} />
-      
+
       <main className={styles.hero}>
         <div className={styles.logoContainer}>
           <div className={styles.logo}>🍔</div>
@@ -87,21 +87,21 @@ export default function Home() {
                   <span className={styles.distance}>📍 {restaurant.distance}</span>
                 </div>
                 <div className={styles.actionButtons}>
-                  <button 
+                  <button
                     className={`${styles.actionButton} ${styles.dislikeButton}`}
                     onClick={handleDislike}
                     aria-label="パス"
                   >
                     ✕
                   </button>
-                  <button 
+                  <button
                     className={`${styles.actionButton} ${styles.superlikeButton}`}
                     onClick={handleSuperlike}
                     aria-label="スーパーいいね"
                   >
                     ⭐
                   </button>
-                  <button 
+                  <button
                     className={`${styles.actionButton} ${styles.likeButton}`}
                     onClick={handleLike}
                     aria-label="いいね"
@@ -114,9 +114,15 @@ export default function Home() {
           ))}
         </div>
 
-        <div className={styles.ctaSection}>
+        {/* <div className={styles.ctaSection}>
           <Link href="/discover" className={`${styles.ctaButton} ${styles.primaryButton}`}>
-            今すぐ始める
+            ログイン
+          </Link>
+        </div> */}
+
+        <div className={styles.ctaSection}>
+          <Link href="/login" className={`${styles.ctaButton} ${styles.primaryButton}`}>
+            ログイン
           </Link>
         </div>
 

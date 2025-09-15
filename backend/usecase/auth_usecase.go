@@ -93,6 +93,7 @@ func (u *AuthUsecase) Login(email, password string) (token string, expiresAt tim
 		return "", time.Time{}, model.ErrInvalidCredentials
 	}
 
+	//JWTを発行してる
 	return u.jwt.Issue(user.ID, 24*time.Hour, nil)
 }
 

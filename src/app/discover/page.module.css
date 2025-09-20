@@ -1,131 +1,470 @@
-/* モバイルファーストのマッチングアプリUI */
-.container {
+.appShell {
+  position: relative;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: calc(env(safe-area-inset-top, 16px) + 24px)
+    20px
+    calc(env(safe-area-inset-bottom, 16px) + 140px);
+  background: radial-gradient(circle at 12% 20%, rgba(99, 102, 241, 0.16), transparent 58%),
+    radial-gradient(circle at 88% 14%, rgba(244, 114, 182, 0.18), transparent 60%),
+    linear-gradient(180deg, #f8faff 0%, #ffffff 100%);
+  color: #0f172a;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  position: relative;
-  overflow: hidden;
-  max-width: 100%;
-  margin: 0;
-  padding: 0;
+  gap: 28px;
 }
 
-/* モダンヘッダー */
-.modernHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 20px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+.backgroundGlowPrimary,
+.backgroundGlowSecondary {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(120px);
+  opacity: 0.7;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.backgroundGlowPrimary {
+  width: 420px;
+  height: 420px;
+  top: -190px;
+  left: -150px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.45) 0%, transparent 70%);
+}
+
+.backgroundGlowSecondary {
+  width: 360px;
+  height: 360px;
+  right: -160px;
+  bottom: -140px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.35) 0%, transparent 72%);
+}
+
+.header {
   position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.logoContainer {
+  top: calc(env(safe-area-inset-top, 16px) + 16px);
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12), 0 1px 0 rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  z-index: 5;
 }
 
-.logo {
-  font-size: 1.8rem;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-}
-
-.appTitle {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #333;
-  margin: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.headerActions {
+.branding {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.filterButton {
-  width: 40px;
-  height: 40px;
-  border-radius: 20px;
-  background: rgba(102, 126, 234, 0.1);
-  border: none;
+.brandIcon {
+  font-size: 2rem;
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 16px;
+  padding: 6px 12px;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.16);
+}
+
+.brandText {
   display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.brandLabel {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #4338ca;
+}
+
+.brandSubtitle {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.headerActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.headerButton {
+  width: 42px;
+  height: 42px;
+  border-radius: 16px;
+  border: none;
+  background: rgba(99, 102, 241, 0.12);
+  color: #4338ca;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.headerButton:hover {
+  transform: translateY(-2px);
+  background: rgba(99, 102, 241, 0.22);
+}
+
+.headerButtonIcon {
   font-size: 1.2rem;
 }
 
-.filterButton:active {
-  background: rgba(102, 126, 234, 0.2);
-  transform: scale(0.95);
+.mainContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
 }
 
-/* カードスタック */
-.cardStackContainer {
-  flex: 1;
+.heroSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.heroTitle {
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1.3;
+  background: linear-gradient(135deg, #1f2937 0%, #4c1d95 95%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.heroSubtitle {
+  font-size: 0.95rem;
+  color: #475569;
+  line-height: 1.65;
+}
+
+.filterChips {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.filterChips::-webkit-scrollbar {
+  display: none;
+}
+
+.filterButton {
+  position: relative;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.84) 0%, rgba(236, 233, 255, 0.4) 100%);
+  box-shadow: 0 14px 30px rgba(79, 70, 229, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  color: #1f2937;
+  font-size: 0.8rem;
+  font-weight: 600;
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.filterButton::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: 17px;
+  background: radial-gradient(circle at top, rgba(255, 255, 255, 0.55), transparent 70%);
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.filterButton:hover,
+.filterButton:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(79, 70, 229, 0.5);
+  box-shadow: 0 18px 36px rgba(79, 70, 229, 0.24);
+  outline: none;
+}
+
+.filterButtonActive {
+  border-color: rgba(37, 99, 235, 0.62);
+  box-shadow: 0 22px 42px rgba(37, 99, 235, 0.28);
+}
+
+.filterButtonIcon {
+  position: relative;
+  z-index: 1;
+  font-size: 1rem;
+}
+
+.filterButtonBody {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.1;
+}
+
+.filterButtonLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #475569;
+}
+
+.filterButtonValue {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #312e81;
+}
+
+.filterStatus {
+  margin-top: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6366f1;
+}
+
+.filterOverlay {
+  position: fixed;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
-  position: relative;
-  min-height: 0;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.42);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  z-index: 40;
 }
 
-.cardStack {
+.filterModal {
   position: relative;
-  width: 100%;
-  max-width: 340px;
-  height: calc(100vh - 200px);
-  max-height: 600px;
-  perspective: 1000px;
+  width: min(420px, 92vw);
+  border-radius: 28px;
+  padding: 28px;
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.92) 0%, rgba(229, 231, 255, 0.68) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 32px 60px rgba(30, 64, 175, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
 }
 
-.backgroundCard {
-  position: absolute;
-  width: 100%;
-  height: 100%;
+.filterModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+
+.filterModalTitle {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.filterModalIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(10px);
-  transform: scale(0.95) translateY(8px);
-  z-index: 1;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(14, 165, 233, 0.18));
+  font-size: 1.1rem;
 }
 
-.mainCard {
+.filterModalLabel {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+.filterModalCaption {
+  margin: 4px 0 0;
+  font-size: 0.76rem;
+  color: #475569;
+}
+
+.filterModalClose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 12px 26px rgba(59, 130, 246, 0.15);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.filterModalClose:hover,
+.filterModalClose:focus-visible {
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 16px 30px rgba(59, 130, 246, 0.25);
+  outline: none;
+}
+
+.filterOptions {
+  display: grid;
+  gap: 12px;
+}
+
+.filterOption {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(224, 231, 255, 0.45));
+  box-shadow: 0 18px 34px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  color: #111827;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.filterOption:hover,
+.filterOption:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 40px rgba(79, 70, 229, 0.28);
+  border-color: rgba(79, 70, 229, 0.45);
+  outline: none;
+}
+
+.filterOptionSelected {
+  border-color: rgba(79, 70, 229, 0.62);
+  box-shadow: 0 26px 48px rgba(79, 70, 229, 0.3);
+  background: linear-gradient(135deg, rgba(224, 231, 255, 0.74), rgba(191, 219, 254, 0.5));
+}
+
+.filterOptionValue {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+.filterOptionHint {
+  font-size: 0.76rem;
+  color: #475569;
+}
+
+.stateCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  padding: 36px 24px;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 26px 48px rgba(15, 23, 42, 0.16);
+  backdrop-filter: blur(26px);
+  -webkit-backdrop-filter: blur(26px);
+}
+
+.stateIcon {
+  font-size: 2rem;
+}
+
+.stateTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.stateMessage {
+  font-size: 0.9rem;
+  color: #475569;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.stateButton {
+  margin-top: 6px;
+  padding: 12px 20px;
+  border-radius: 18px;
+  border: none;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 95%);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 16px 32px rgba(99, 102, 241, 0.24);
+}
+
+.cardSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.cardDeck {
+  position: relative;
+  width: min(360px, 92vw);
+  aspect-ratio: 3 / 5;
+}
+
+.card {
   position: absolute;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
-  transition: transform 0.15s ease-out;
-  touch-action: none;
+  inset: 0;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 26px 50px rgba(15, 23, 42, 0.18);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  overflow: hidden;
+}
+
+.cardSecondary {
+  transform: translateY(24px) scale(0.93);
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.cardPrimary {
+  pointer-events: auto;
+  transition: transform 0.2s ease;
 }
 
 .cardSlide {
   width: 100%;
   height: 100%;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-  background: white;
 }
 
 .cardImageContainer {
   position: relative;
   width: 100%;
   height: 100%;
-  background: #f8f9fa;
+  background: #f8fafc;
 }
 
 .cardImage {
@@ -135,413 +474,340 @@
   display: block;
 }
 
-/* スワイプインジケーター */
-.swipeIndicator {
+.cardGradient {
   position: absolute;
-  top: 40px;
-  font-size: 1.5rem;
-  font-weight: 900;
-  padding: 12px 24px;
-  border-radius: 8px;
-  border: 3px solid;
-  background: rgba(255, 255, 255, 0.95);
-  opacity: 0;
-  transform: scale(0.8);
-  transition: all 0.15s ease;
-  z-index: 10;
-  pointer-events: none;
+  inset: 0;
+  background: linear-gradient(160deg, rgba(15, 23, 42, 0.05) 0%, rgba(15, 23, 42, 0.55) 100%);
 }
 
-.swipeIndicator.visible {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.passIndicator {
-  left: 16px;
-  color: #ff4458;
-  border-color: #ff4458;
-  transform: rotate(-15deg) scale(0.8);
-}
-
-.passIndicator.visible {
-  transform: rotate(-15deg) scale(1);
-}
-
-.likeIndicator {
-  right: 16px;
-  color: #66d7d2;
-  border-color: #66d7d2;
-  transform: rotate(15deg) scale(0.8);
-}
-
-.likeIndicator.visible {
-  transform: rotate(15deg) scale(1);
-}
-
-/* カード情報オーバーレイ */
 .cardOverlay {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-  padding: 60px 20px 20px;
-  color: white;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 24px;
+  background: linear-gradient(180deg, transparent 40%, rgba(15, 23, 42, 0.78) 100%);
+  color: #f8fafc;
 }
 
-.restaurantBadge {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 6px 12px;
-  z-index: 5;
+.cardBadgeGroup {
+  display: inline-flex;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
-.badgeText {
-  color: #333;
-  font-weight: 600;
+.cardBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
   font-size: 0.75rem;
+  font-weight: 600;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.cardBadgePrimary {
+  background: rgba(15, 23, 42, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.cardBadgeSecondary {
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #e0e7ff;
 }
 
 .cardInfo {
-  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .restaurantName {
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   font-weight: 700;
-  margin: 0 0 12px 0;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   line-height: 1.3;
+  margin: 0;
 }
 
 .restaurantDetails {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .detailItem {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
+  color: rgba(248, 250, 252, 0.9);
 }
 
 .detailIcon {
-  font-size: 0.9rem;
-  width: 16px;
-  text-align: center;
+  font-size: 1rem;
 }
 
 .detailText {
-  color: rgba(255, 255, 255, 0.9);
-  line-height: 1.3;
-}
-
-.catchPhrase {
-  margin-top: 8px;
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.8);
-  font-style: italic;
   line-height: 1.4;
 }
 
-/* アクションボタン */
-.actionButtons {
-  display: flex;
-  justify-content: center;
+.catchPhrase {
+  font-size: 0.85rem;
+  color: rgba(248, 250, 252, 0.78);
+  line-height: 1.5;
+}
+
+.swipeIndicator {
+  position: absolute;
+  top: 32px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  border: 2px solid;
+  background: rgba(255, 255, 255, 0.92);
+  color: #0f172a;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+
+.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.passIndicator {
+  left: 24px;
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.65);
+  transform: rotate(-8deg) scale(0.9);
+}
+
+.passIndicator.visible {
+  transform: rotate(-8deg) scale(1);
+}
+
+.likeIndicator {
+  right: 24px;
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.65);
+  transform: rotate(8deg) scale(0.9);
+}
+
+.likeIndicator.visible {
+  transform: rotate(8deg) scale(1);
+}
+
+.actionRing {
+  display: inline-flex;
   align-items: center;
   gap: 20px;
-  padding: 20px 16px 16px;
-  position: relative;
-  z-index: 10;
+  padding: 16px 22px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 22px 42px rgba(15, 23, 42, 0.18);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .actionButton {
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   border: none;
-  cursor: pointer;
+  background: rgba(255, 255, 255, 0.96);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
-  transition: all 0.15s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  position: relative;
-  background: white;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.actionButton:active:not(:disabled) {
-  transform: scale(0.9);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  font-size: 1.6rem;
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.16);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
 }
 
 .actionButton:disabled {
-  opacity: 0.5;
-  transform: none;
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-.passButton {
-  background: linear-gradient(135deg, #ff4458 0%, #ff6b7d 100%);
+.actionButton:not(:disabled):hover {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 40px rgba(15, 23, 42, 0.2);
 }
 
-.passButton .actionIcon {
-  color: white;
-  font-weight: 900;
-  font-size: 1.5rem;
+.actionPass {
+  color: #ef4444;
 }
 
-.superlikeButton {
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, #4ecdc4 0%, #66d7d2 100%);
+.actionSuperLike {
+  color: #38bdf8;
 }
 
-.superlikeButton .actionIcon {
-  color: white;
-  font-size: 1.1rem;
+.actionLike {
+  color: #34d399;
 }
 
-.likeButton {
-  background: linear-gradient(135deg, #a8e6cf 0%, #66d7d2 100%);
-}
-
-.likeButton .actionIcon {
-  color: white;
-  font-size: 1.4rem;
-}
-
-/* プログレスインジケーター */
 .progressContainer {
+  width: min(360px, 92vw);
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 12px 20px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  justify-content: space-between;
+  gap: 14px;
 }
 
 .progressBar {
   flex: 1;
-  max-width: 150px;
-  height: 3px;
-  background: rgba(102, 126, 234, 0.2);
-  border-radius: 2px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.25);
   overflow: hidden;
 }
 
 .progressFill {
   height: 100%;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-  border-radius: 2px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 90%);
+  border-radius: inherit;
   transition: width 0.3s ease;
 }
 
 .progressText {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #333;
-  min-width: 40px;
-  text-align: center;
+  color: #475569;
 }
 
-/* ローディング状態 */
-.loadingContainer {
+.bottomNav {
+  position: fixed;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom, 16px) + 12px);
+  transform: translateX(-50%);
+  width: min(420px, calc(100% - 32px));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 26px;
+  background: rgba(15, 23, 42, 0.78);
+  box-shadow: 0 22px 42px rgba(15, 23, 42, 0.32);
+  color: #e2e8f0;
+  z-index: 10;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.navButton {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  flex: 1;
-  gap: 20px;
-  color: white;
-  padding: 40px 20px;
-}
-
-.loadingSpinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(255, 255, 255, 0.2);
-  border-top: 3px solid white;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.loadingText {
-  font-size: 1rem;
-  font-weight: 500;
-  text-align: center;
-  margin: 0;
-  line-height: 1.4;
-}
-
-/* エラー・空状態 */
-.errorContainer,
-.emptyContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  gap: 20px;
-  color: white;
-  text-align: center;
-  padding: 40px 20px;
-}
-
-.errorIcon,
-.emptyIcon {
-  font-size: 3rem;
-  opacity: 0.8;
-}
-
-.errorTitle,
-.emptyTitle {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0;
-  color: white;
-  line-height: 1.3;
-}
-
-.errorMessage,
-.emptyMessage {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.8);
-  margin: 0;
-  line-height: 1.4;
-}
-
-.modernRetryButton {
-  padding: 12px 24px;
-  background: rgba(255, 255, 255, 0.95);
-  color: #333;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  background: transparent;
   border: none;
-  border-radius: 10px;
-  font-size: 0.9rem;
+  color: inherit;
+  font-size: 0.7rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  backdrop-filter: blur(10px);
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
+  letter-spacing: 0.03em;
 }
 
-.modernRetryButton:active {
-  background: white;
-  transform: scale(0.95);
+.navButtonActive {
+  background: rgba(99, 102, 241, 0.22);
+  color: #f8fafc;
 }
 
-/* スワイプアニメーション */
+.navIcon {
+  font-size: 1.2rem;
+}
+
+.navLabel {
+  font-size: 0.7rem;
+}
+
 .swipeLeft {
-  animation: swipeLeftOut 0.3s ease-out forwards;
+  animation: swipeLeft 0.32s ease forwards;
 }
 
 .swipeRight {
-  animation: swipeRightOut 0.3s ease-out forwards;
+  animation: swipeRight 0.32s ease forwards;
 }
 
 .swipeUp {
-  animation: swipeUpOut 0.3s ease-out forwards;
+  animation: swipeUp 0.32s ease forwards;
 }
 
-@keyframes swipeLeftOut {
+@keyframes swipeLeft {
   to {
-    transform: translateX(-100vw) rotate(-30deg);
+    transform: translate(-220px, -40px) rotate(-18deg);
     opacity: 0;
   }
 }
 
-@keyframes swipeRightOut {
+@keyframes swipeRight {
   to {
-    transform: translateX(100vw) rotate(30deg);
+    transform: translate(220px, -40px) rotate(18deg);
     opacity: 0;
   }
 }
 
-@keyframes swipeUpOut {
+@keyframes swipeUp {
   to {
-    transform: translateY(-100vh) scale(0.8);
+    transform: translate(0, -240px) scale(0.85);
     opacity: 0;
   }
 }
 
-/* 極小画面対応 */
-@media (max-width: 360px) {
-  .modernHeader {
-    padding: 10px 16px;
+@media (max-width: 480px) {
+  .header {
+    padding: 14px 18px;
   }
-  
-  .appTitle {
-    font-size: 1.1rem;
+
+  .cardDeck {
+    width: min(320px, 90vw);
   }
-  
-  .logo {
-    font-size: 1.6rem;
-  }
-  
-  .cardStack {
-    max-width: 300px;
-    height: calc(100vh - 180px);
-  }
-  
-  .cardStackContainer {
-    padding: 12px;
-  }
-  
-  .restaurantName {
-    font-size: 1.1rem;
-  }
-  
-  .actionButtons {
+
+  .actionRing {
     gap: 16px;
-    padding: 16px 12px 12px;
   }
-  
+
   .actionButton {
-    width: 50px;
-    height: 50px;
-    font-size: 1.1rem;
+    width: 58px;
+    height: 58px;
+    font-size: 1.4rem;
   }
-  
-  .superlikeButton {
-    width: 42px;
-    height: 42px;
-  }
-  
+
   .progressContainer {
-    padding: 10px 16px;
-  }
-  
-  .progressText {
-    font-size: 0.75rem;
+    width: min(320px, 90vw);
   }
 }
 
-/* iPhone SE対応 */
-@media (max-height: 670px) {
-  .cardStack {
-    height: calc(100vh - 160px);
-    max-height: 480px;
+@media (min-width: 768px) {
+  .appShell {
+    padding-left: clamp(60px, 8vw, 140px);
+    padding-right: clamp(60px, 8vw, 140px);
   }
-  
-  .actionButtons {
-    padding: 16px;
+
+  .heroTitle {
+    font-size: 2.1rem;
+  }
+
+  .heroSubtitle {
+    font-size: 1.05rem;
+  }
+
+  .cardDeck {
+    width: min(400px, 58vw);
+  }
+
+  .bottomNav {
+    width: min(480px, calc(100% - 120px));
   }
 }

@@ -1,17 +1,73 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import { type Shop } from '@/lib/api/restaurants';
-import UserIcon from '@/components/ui/UserIcon/UserIcon';
-import styles from './page.module.css';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import type { MouseEvent, TouchEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import UserIcon from '@/components/ui/UserIcon/UserIcon';
+import { type Shop } from '@/lib/api/restaurants';
+import styles from './page.module.css';
+
+type FilterKey = 'location' | 'availability' | 'budget';
+
+type FilterOption = {
+    value: string;
+    hint: string;
+};
+
+type FilterConfig = {
+    key: FilterKey;
+    label: string;
+    icon: string;
+    options: FilterOption[];
+};
+
+const filterConfigs: FilterConfig[] = [
+    {
+        key: 'location',
+        label: '現在地',
+        icon: '📍',
+        options: [
+            { value: '梅田', hint: '大型商業施設と夜景ディナーが楽しめる' },
+            { value: '天王寺', hint: 'あべのハルカス周辺の多彩なグルメ' },
+            { value: '難波', hint: 'ミナミの活気ある食スポットをチェック' },
+            { value: '吹田', hint: '万博記念公園エリアの落ち着いた名店' }
+        ]
+    },
+    {
+        key: 'availability',
+        label: '営業状況',
+        icon: '🌙',
+        options: [
+            { value: 'OPEN NOW', hint: '今すぐ入店できるお店' },
+            { value: '予約受付中', hint: '当日予約可能なレストラン' },
+            { value: 'テイクアウト可', hint: '持ち帰りメニューを提供' }
+        ]
+    },
+    {
+        key: 'budget',
+        label: '予算',
+        icon: '💴',
+        options: [
+            { value: '1,000円', hint: 'サクッと立ち寄れるワンコイン＋α' },
+            { value: '3,000円', hint: 'デイリーに使えるちょっと贅沢ライン' },
+            { value: '5,000円', hint: 'ゆったり食事を楽しむミドルレンジ' }
+        ]
+    }
+];
+
+type SwipeAction = 'pass' | 'like' | 'superlike';
+
+type StateCardOptions = {
+    icon: string;
+    title: string;
+    message: string;
+    actionLabel?: string;
+    onAction?: () => void;
+};
 
 export default function Discover() {
-
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
     const AUTH_COOKIE_NAME = process.env.NEXT_PUBLIC_AUTH_COOKIE_NAME || 'auth_token';
-    const TOKEN_EXPIRY_HOURS = Number(process.env.NEXT_PUBLIC_AUTH_TOKEN_HOURS || '12');
-    const COOKIE_MAX_AGE_MS = TOKEN_EXPIRY_HOURS * 60 * 60 * 1000;
 
     const [restaurants, setRestaurants] = useState<Shop[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -21,26 +77,55 @@ export default function Discover() {
     const [startX, setStartX] = useState(0);
     const [translateX, setTranslateX] = useState(0);
     const [isAnimating, setIsAnimating] = useState(false);
-    const containerRef = useRef<HTMLDivElement>(null);
-    const router = useRouter();
+    const [activeFilter, setActiveFilter] = useState<FilterKey | null>(null);
+    const [filterSelections, setFilterSelections] = useState<Record<FilterKey, string>>({
+        location: '梅田',
+        availability: 'OPEN NOW',
+        budget: '3,000円'
+    });
+    const [isClient, setIsClient] = useState(false);
 
-    function getAuthTokenFromCookie(): string | null {
-        if (typeof document === 'undefined') return null;
-        const match = document.cookie.match(new RegExp(`(?:^|; )${AUTH_COOKIE_NAME}=([^;]*)`));
-        return match ? decodeURIComponent(match[1]) : null;
-    }
+    const router = useRouter();
+    const activeCardRef = useRef<HTMLElement | null>(null);
+
+    const activeFilterConfig = useMemo(
+        () => (activeFilter ? filterConfigs.find((config) => config.key === activeFilter) ?? null : null),
+        [activeFilter]
+    );
 
     useEffect(() => {
         loadRestaurants();
     }, []);
 
     useEffect(() => {
-        const existing_token = getAuthTokenFromCookie()
-        if (!existing_token) {
-            router.push("/login")
+        const token = getAuthTokenFromCookie();
+        if (!token) {
+            router.push('/login');
         }
+    }, [router]);
+
+    useEffect(() => {
+        setIsClient(true);
     }, []);
 
+    useEffect(() => {
+        if (!isClient) return;
+        const body = document.body;
+        if (activeFilter) {
+            body.style.overflow = 'hidden';
+        } else {
+            body.style.overflow = '';
+        }
+        return () => {
+            body.style.overflow = '';
+        };
+    }, [activeFilter, isClient]);
+
+    const getAuthTokenFromCookie = () => {
+        if (typeof document === 'undefined') return null;
+        const match = document.cookie.match(new RegExp(`(?:^|; )${AUTH_COOKIE_NAME}=([^;]*)`));
+        return match ? decodeURIComponent(match[1]) : null;
+    };
 
     const loadRestaurants = async () => {
         try {
@@ -48,20 +133,19 @@ export default function Discover() {
             const response = await fetch('/api/restaurants?count=10');
 
             if (!response.ok) {
-                throw new Error(`データの取得に失敗しました`);
+                throw new Error('データの取得に失敗しました');
             }
 
             const data = await response.json();
 
-            console.log("data：", data)
-
-            if (data.error) {
+            if (data?.error) {
                 throw new Error(data.message || 'データの取得に失敗しました');
             }
 
             if (Array.isArray(data)) {
                 setRestaurants(data);
                 setError(null);
+                setCurrentIndex(0);
             } else {
                 throw new Error('データ形式が無効です');
             }
@@ -74,349 +158,423 @@ export default function Discover() {
     };
 
     const handleReload = () => {
-        window.location.reload();
+        loadRestaurants();
     };
 
-    const handleAction = (action: 'pass' | 'like' | 'superlike') => {
-        if (isAnimating) return;
+    const handleSelectFilter = (key: FilterKey, value: string) => {
+        setFilterSelections((prev) => ({
+            ...prev,
+            [key]: value
+        }));
+        setActiveFilter(null);
+    };
+
+    const advanceCard = () => {
+        if (currentIndex < restaurants.length - 1) {
+            setCurrentIndex((prev) => prev + 1);
+            return;
+        }
+        loadRestaurants();
+    };
+
+    const handleAction = (action: SwipeAction) => {
+        if (isAnimating || restaurants.length === 0) return;
 
         setIsAnimating(true);
 
-        // アニメーション方向を決定
         let animationClass = '';
-        switch (action) {
-            case 'pass':
-                animationClass = styles.swipeLeft;
-                break;
-            case 'like':
-                animationClass = styles.swipeRight;
-                break;
-            case 'superlike':
-                animationClass = styles.swipeUp;
-                break;
-        }
+        if (action === 'pass') animationClass = styles.swipeLeft;
+        if (action === 'like') animationClass = styles.swipeRight;
+        if (action === 'superlike') animationClass = styles.swipeUp;
 
-        // アニメーションを適用
-        const cardElement = containerRef.current?.querySelector(`.${styles.cardSlide}`) as HTMLElement;
-        if (cardElement) {
+        const cardElement = activeCardRef.current?.querySelector(`.${styles.cardSlide}`) as HTMLElement | null;
+        if (cardElement && animationClass) {
             cardElement.classList.add(animationClass);
         }
 
         setTimeout(() => {
-            // アニメーションクラスをクリア
-            if (cardElement) {
+            if (cardElement && animationClass) {
                 cardElement.classList.remove(animationClass);
             }
-
-            // スワイプ状態をリセット
             setTranslateX(0);
-
-            if (currentIndex < restaurants.length - 1) {
-                setCurrentIndex(currentIndex + 1);
-            } else {
-                // 最後のカードの場合、新しいレストランを読み込む
-                loadRestaurants();
-                setCurrentIndex(0);
-            }
+            advanceCard();
             setIsAnimating(false);
-        }, 300);
+        }, 320);
     };
 
     const handlePrevious = () => {
         if (currentIndex > 0) {
-            setCurrentIndex(currentIndex - 1);
+            setCurrentIndex((prev) => prev - 1);
         }
     };
 
     const handleNext = () => {
         if (currentIndex < restaurants.length - 1) {
-            setCurrentIndex(currentIndex + 1);
+            setCurrentIndex((prev) => prev + 1);
         }
     };
 
-    // マウスイベント
-    const handleMouseDown = (e: React.MouseEvent) => {
+    const handleMouseDown = (event: MouseEvent) => {
         if (isAnimating) return;
         setIsDragging(true);
-        setStartX(e.clientX);
+        setStartX(event.clientX);
     };
 
-    const handleMouseMove = (e: React.MouseEvent) => {
+    const handleMouseMove = (event: MouseEvent) => {
         if (!isDragging || isAnimating) return;
-        const diff = e.clientX - startX;
+        const diff = event.clientX - startX;
         setTranslateX(diff);
     };
 
     const handleMouseUp = () => {
         if (!isDragging || isAnimating) return;
         setIsDragging(false);
-
-        // スワイプ判定
-        if (Math.abs(translateX) > 80) {
-            if (translateX > 0) {
-                handleAction('like');
-            } else {
-                handleAction('pass');
-            }
-        } else if (translateX > 50) {
-            handlePrevious();
-        } else if (translateX < -50) {
-            handleNext();
-        }
-        setTranslateX(0);
+        handleGestureRelease();
     };
 
     const handleMouseLeave = () => {
         if (isDragging) {
-            handleMouseUp();
+            setIsDragging(false);
+            handleGestureRelease();
         }
     };
 
-    // タッチイベント
-    const handleTouchStart = (e: React.TouchEvent) => {
+    const handleTouchStart = (event: TouchEvent) => {
         if (isAnimating) return;
         setIsDragging(true);
-        setStartX(e.touches[0].clientX);
+        setStartX(event.touches[0].clientX);
     };
 
-    const handleTouchMove = (e: React.TouchEvent) => {
+    const handleTouchMove = (event: TouchEvent) => {
         if (!isDragging || isAnimating) return;
-        const diff = e.touches[0].clientX - startX;
+        const diff = event.touches[0].clientX - startX;
         setTranslateX(diff);
     };
 
     const handleTouchEnd = () => {
-        handleMouseUp();
+        if (!isDragging) return;
+        setIsDragging(false);
+        handleGestureRelease();
     };
 
-    if (loading) {
-        return (
-            <div className={styles.container}>
-                <div className={styles.modernHeader}>
-                    <div className={styles.logoContainer}>
-                        <div className={styles.logo}>🍽️</div>
-                        <h1 className={styles.appTitle}>FoodMatch</h1>
-                    </div>
-                    <UserIcon size="medium" />
-                </div>
-                <div className={styles.loadingContainer}>
-                    <div className={styles.loadingSpinner}></div>
-                    <p className={styles.loadingText}>美味しいお店を探しています...</p>
-                </div>
-            </div>
-        );
-    }
+    const handleGestureRelease = () => {
+        if (Math.abs(translateX) > 100) {
+            handleAction(translateX > 0 ? 'like' : 'pass');
+        } else if (translateX > 70) {
+            handlePrevious();
+            setTranslateX(0);
+        } else if (translateX < -70) {
+            handleNext();
+            setTranslateX(0);
+        } else {
+            setTranslateX(0);
+        }
+    };
 
-    if (error) {
-        return (
-            <div className={styles.container}>
-                <div className={styles.modernHeader}>
-                    <div className={styles.logoContainer}>
-                        <div className={styles.logo}>🍽️</div>
-                        <h1 className={styles.appTitle}>FoodMatch</h1>
-                    </div>
-                    <UserIcon size="medium" />
-                </div>
-                <div className={styles.errorContainer}>
-                    <div className={styles.errorIcon}>😞</div>
-                    <h2 className={styles.errorTitle}>接続できませんでした</h2>
-                    <p className={styles.errorMessage}>データの取得に失敗しました</p>
-                    <button onClick={handleReload} className={styles.modernRetryButton}>
-                        もう一度試す
-                    </button>
-                </div>
-            </div>
-        );
-    }
+    const activeRestaurant = restaurants[currentIndex];
+    const upcomingRestaurant = restaurants[currentIndex + 1];
+    const hasRestaurants = Boolean(activeRestaurant);
+    const progressValue = hasRestaurants ? ((currentIndex + 1) / restaurants.length) * 100 : 0;
+    const candidateSummary = restaurants.length ? `候補：${restaurants.length}件` : '候補を探索中';
 
-    if (restaurants.length === 0) {
-        return (
-            <div className={styles.container}>
-                <div className={styles.modernHeader}>
-                    <div className={styles.logoContainer}>
-                        <div className={styles.logo}>🍽️</div>
-                        <h1 className={styles.appTitle}>FoodMatch</h1>
-                    </div>
-                    <UserIcon size="medium" />
-                </div>
-                <div className={styles.emptyContainer}>
-                    <div className={styles.emptyIcon}>🔍</div>
-                    <h2 className={styles.emptyTitle}>お店が見つかりませんでした</h2>
-                    <p className={styles.emptyMessage}>別のエリアで探してみましょう</p>
-                    <button onClick={handleReload} className={styles.modernRetryButton}>
-                        読み込む
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    const currentRestaurant = restaurants[currentIndex];
+    const renderStateCard = ({ icon, title, message, actionLabel, onAction }: StateCardOptions) => (
+        <section className={styles.stateCard}>
+            <div className={styles.stateIcon}>{icon}</div>
+            <h2 className={styles.stateTitle}>{title}</h2>
+            <p className={styles.stateMessage}>{message}</p>
+            {actionLabel && onAction && (
+                <button type="button" className={styles.stateButton} onClick={onAction}>
+                    {actionLabel}
+                </button>
+            )}
+        </section>
+    );
 
     return (
-        <div className={styles.container}>
-            {/* モダンヘッダー */}
-            <div className={styles.modernHeader}>
-                <div className={styles.logoContainer}>
-                    <div className={styles.logo}>🍽️</div>
-                    <h1 className={styles.appTitle}>FoodMatch</h1>
+        <div className={styles.appShell}>
+            <div className={styles.backgroundGlowPrimary} />
+            <div className={styles.backgroundGlowSecondary} />
+
+            <header className={styles.header}>
+                <div className={styles.branding}>
+                    <span className={styles.brandIcon}>🍣</span>
+                    <div className={styles.brandText}>
+                        <span className={styles.brandLabel}>Food Matching</span>
+                        <span className={styles.brandSubtitle}>近くのおすすめを発見</span>
+                    </div>
                 </div>
                 <div className={styles.headerActions}>
-                    <button className={styles.filterButton}>
-                        <span>⚙️</span>
+                    <button type="button" className={styles.headerButton}>
+                        <span className={styles.headerButtonIcon}>⚙️</span>
                     </button>
                     <UserIcon size="medium" />
                 </div>
-            </div>
+            </header>
 
-            {/* カードスタック */}
-            <div className={styles.cardStackContainer}>
-                <div className={styles.cardStack}>
-                    {/* 次のカード（背景） */}
-                    {restaurants[currentIndex + 1] && (
-                        <div key={restaurants[currentIndex + 1].id} className={styles.backgroundCard}>
-                            <div className={styles.cardImageContainer}>
-                                <img
-                                    src={restaurants[currentIndex + 1].photo.pc.l || restaurants[currentIndex + 1].photo.pc.m}
-                                    alt={restaurants[currentIndex + 1].name}
-                                    className={styles.cardImage}
-                                />
-                                {/* 背景カード用の情報オーバーレイ */}
-                                <div className={styles.cardOverlay}>
-                                    <div className={styles.restaurantBadge}>
-                                        <span className={styles.badgeText}>{restaurants[currentIndex + 1].genre.name}</span>
-                                    </div>
-                                    <div className={styles.cardInfo}>
-                                        <h2 className={styles.restaurantName}>{restaurants[currentIndex + 1].name}</h2>
-                                        <div className={styles.restaurantDetails}>
-                                            <div className={styles.detailItem}>
-                                                <span className={styles.detailIcon}>📍</span>
-                                                <span className={styles.detailText}>{restaurants[currentIndex + 1].access}</span>
-                                            </div>
-                                            <div className={styles.detailItem}>
-                                                <span className={styles.detailIcon}>💰</span>
-                                                <span className={styles.detailText}>{restaurants[currentIndex + 1].budget.name}</span>
-                                            </div>
-                                            {restaurants[currentIndex + 1].catch && (
-                                                <div className={styles.catchPhrase}>
-                                                    {restaurants[currentIndex + 1].catch}
-                                                </div>
-                                            )}
+            <main className={styles.mainContent}>
+                <section className={styles.heroSection}>
+                    {/* <h1 className={styles.heroTitle}>「食べたい」をスワイプで</h1>
+                    <p className={styles.heroSubtitle}>
+                        スキマ時間などでスワイプするだけ。店選びをすばやく。
+                    </p> */}
+                    <div className={styles.filterChips}>
+                        {filterConfigs.map((filter) => {
+                            const isActive = activeFilter === filter.key;
+                            return (
+                                <button
+                                    key={filter.key}
+                                    type="button"
+                                    className={`${styles.filterButton} ${isActive ? styles.filterButtonActive : ''
+                                        }`}
+                                    onClick={() =>
+                                        setActiveFilter((prev) => (prev === filter.key ? null : filter.key))
+                                    }
+                                    aria-pressed={isActive}
+                                    aria-haspopup="dialog"
+                                    aria-expanded={isActive}
+                                >
+                                    <span className={styles.filterButtonIcon}>{filter.icon}</span>
+                                    <span className={styles.filterButtonBody}>
+                                        <span className={styles.filterButtonLabel}>{filter.label}</span>
+                                        <span className={styles.filterButtonValue}>{filterSelections[filter.key]}</span>
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                    <div className={styles.filterStatus}>{candidateSummary}</div>
+                </section>
+
+                {isClient && activeFilter && activeFilterConfig &&
+                    createPortal(
+                        <div className={styles.filterOverlay} onClick={() => setActiveFilter(null)}>
+                            <div
+                                className={styles.filterModal}
+                                role="dialog"
+                                aria-modal="true"
+                                aria-labelledby={`discover-filter-${activeFilterConfig.key}`}
+                                onClick={(event) => event.stopPropagation()}
+                            >
+                                <div className={styles.filterModalHeader}>
+                                    <div className={styles.filterModalTitle}>
+                                        <span className={styles.filterModalIcon}>{activeFilterConfig.icon}</span>
+                                        <div>
+                                            <p
+                                                id={`discover-filter-${activeFilterConfig.key}`}
+                                                className={styles.filterModalLabel}
+                                            >
+                                                {activeFilterConfig.label}
+                                            </p>
+                                            <p className={styles.filterModalCaption}>条件を微調整してさらにマッチング精度をアップ</p>
                                         </div>
                                     </div>
+                                    <button
+                                        type="button"
+                                        className={styles.filterModalClose}
+                                        onClick={() => setActiveFilter(null)}
+                                        aria-label="フィルターを閉じる"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                                <div className={styles.filterOptions}>
+                                    {activeFilterConfig.options.map((option) => {
+                                        const isSelected = filterSelections[activeFilterConfig.key] === option.value;
+                                        return (
+                                            <button
+                                                key={option.value}
+                                                type="button"
+                                                className={`${styles.filterOption} ${isSelected ? styles.filterOptionSelected : ''
+                                                    }`}
+                                                onClick={() => handleSelectFilter(activeFilterConfig.key, option.value)}
+                                            >
+                                                <span className={styles.filterOptionValue}>{option.value}</span>
+                                                <span className={styles.filterOptionHint}>{option.hint}</span>
+                                            </button>
+                                        );
+                                    })}
                                 </div>
                             </div>
-                        </div>
+                        </div>,
+                        document.body
                     )}
 
-                    {/* メインカード */}
-                    <div
-                        key={currentRestaurant.id}
-                        className={styles.mainCard}
-                        ref={containerRef}
-                        onMouseDown={handleMouseDown}
-                        onMouseMove={handleMouseMove}
-                        onMouseUp={handleMouseUp}
-                        onMouseLeave={handleMouseLeave}
-                        onTouchStart={handleTouchStart}
-                        onTouchMove={handleTouchMove}
-                        onTouchEnd={handleTouchEnd}
-                        style={{
-                            transform: `translateX(${translateX}px) rotate(${translateX * 0.1}deg)`,
-                            cursor: isDragging ? 'grabbing' : 'grab'
-                        }}
-                    >
-                        <div className={styles.cardSlide}>
-                            <div className={styles.cardImageContainer}>
-                                <img
-                                    src={currentRestaurant.photo.pc.l || currentRestaurant.photo.pc.m}
-                                    alt={currentRestaurant.name}
-                                    className={styles.cardImage}
-                                />
+                {loading &&
+                    renderStateCard({
+                        icon: '🍽️',
+                        title: '候補を探索中',
+                        message: '美味しいお店を見つけています…'
+                    })}
 
-                                {/* スワイプインジケーター */}
-                                <div
-                                    className={`${styles.swipeIndicator} ${styles.passIndicator} ${translateX < -50 ? styles.visible : ''
-                                        }`}
-                                >
-                                    PASS
-                                </div>
-                                <div
-                                    className={`${styles.swipeIndicator} ${styles.likeIndicator} ${translateX > 50 ? styles.visible : ''
-                                        }`}
-                                >
-                                    LIKE
-                                </div>
+                {!loading && error &&
+                    renderStateCard({
+                        icon: '😞',
+                        title: '読み込みに失敗しました',
+                        message: '通信環境をご確認のうえ、もう一度お試しください。',
+                        actionLabel: '再読み込み',
+                        onAction: handleReload
+                    })}
 
-                                {/* カード情報オーバーレイ */}
-                                <div className={styles.cardOverlay}>
-                                    <div className={styles.restaurantBadge}>
-                                        <span className={styles.badgeText}>{currentRestaurant.genre.name}</span>
-                                    </div>
-                                    <div className={styles.cardInfo}>
-                                        <h2 className={styles.restaurantName}>{currentRestaurant.name}</h2>
-                                        <div className={styles.restaurantDetails}>
-                                            <div className={styles.detailItem}>
-                                                <span className={styles.detailIcon}>📍</span>
-                                                <span className={styles.detailText}>{currentRestaurant.access}</span>
+                {!loading && !error && !hasRestaurants &&
+                    renderStateCard({
+                        icon: '🔍',
+                        title: '近くに候補が見つかりません',
+                        message: '条件をゆるめるか、別のエリアを試してみましょう。',
+                        actionLabel: '再検索',
+                        onAction: handleReload
+                    })}
+
+                {!loading && !error && hasRestaurants && (
+                    <section className={styles.cardSection}>
+                        <div className={styles.cardDeck}>
+                            {upcomingRestaurant && (
+                                <article className={`${styles.card} ${styles.cardSecondary}`}>
+                                    <div className={styles.cardImageContainer}>
+                                        <img
+                                            src={upcomingRestaurant.photo.pc.l || upcomingRestaurant.photo.pc.m}
+                                            alt={upcomingRestaurant.name}
+                                            className={styles.cardImage}
+                                        />
+                                        <div className={styles.cardGradient} />
+                                        <div className={styles.cardOverlay}>
+                                            <div className={styles.cardBadgeGroup}>
+                                                <span className={`${styles.cardBadge} ${styles.cardBadgePrimary}`}>
+                                                    {upcomingRestaurant.genre.name}
+                                                </span>
+                                                <span className={`${styles.cardBadge} ${styles.cardBadgeSecondary}`}>
+                                                    {upcomingRestaurant.budget.name}
+                                                </span>
                                             </div>
-                                            <div className={styles.detailItem}>
-                                                <span className={styles.detailIcon}>💰</span>
-                                                <span className={styles.detailText}>{currentRestaurant.budget.name}</span>
-                                            </div>
-                                            {currentRestaurant.catch && (
-                                                <div className={styles.catchPhrase}>
-                                                    {currentRestaurant.catch}
+                                            <div className={styles.cardInfo}>
+                                                <h2 className={styles.restaurantName}>{upcomingRestaurant.name}</h2>
+                                                <div className={styles.restaurantDetails}>
+                                                    <div className={styles.detailItem}>
+                                                        <span className={styles.detailIcon}>📍</span>
+                                                        <span className={styles.detailText}>{upcomingRestaurant.access}</span>
+                                                    </div>
                                                 </div>
-                                            )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                            )}
+
+                            <article
+                                ref={activeCardRef}
+                                className={`${styles.card} ${styles.cardPrimary}`}
+                                style={{ transform: `translateX(${translateX}px) rotate(${translateX / 25}deg)` }}
+                                onMouseDown={handleMouseDown}
+                                onMouseMove={handleMouseMove}
+                                onMouseUp={handleMouseUp}
+                                onMouseLeave={handleMouseLeave}
+                                onTouchStart={handleTouchStart}
+                                onTouchMove={handleTouchMove}
+                                onTouchEnd={handleTouchEnd}
+                            >
+                                <div className={styles.cardSlide}>
+                                    <div className={styles.cardImageContainer}>
+                                        <img
+                                            src={activeRestaurant.photo.pc.l || activeRestaurant.photo.pc.m}
+                                            alt={activeRestaurant.name}
+                                            className={styles.cardImage}
+                                        />
+                                        <div className={styles.cardGradient} />
+
+                                        <div
+                                            className={`${styles.swipeIndicator} ${styles.passIndicator} ${translateX < -60 ? styles.visible : ''}`}
+                                        >
+                                            PASS
+                                        </div>
+                                        <div
+                                            className={`${styles.swipeIndicator} ${styles.likeIndicator} ${translateX > 60 ? styles.visible : ''}`}
+                                        >
+                                            LIKE
+                                        </div>
+
+                                        <div className={styles.cardOverlay}>
+                                            <div className={styles.cardBadgeGroup}>
+                                                <span className={`${styles.cardBadge} ${styles.cardBadgePrimary}`}>
+                                                    {activeRestaurant.genre.name}
+                                                </span>
+                                                <span className={`${styles.cardBadge} ${styles.cardBadgeSecondary}`}>
+                                                    {activeRestaurant.budget.name}
+                                                </span>
+                                            </div>
+                                            <div className={styles.cardInfo}>
+                                                <h2 className={styles.restaurantName}>{activeRestaurant.name}</h2>
+                                                <div className={styles.restaurantDetails}>
+                                                    <div className={styles.detailItem}>
+                                                        <span className={styles.detailIcon}>📍</span>
+                                                        <span className={styles.detailText}>{activeRestaurant.access}</span>
+                                                    </div>
+                                                    {activeRestaurant.catch && (
+                                                        <div className={styles.catchPhrase}>{activeRestaurant.catch}</div>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </article>
                         </div>
-                    </div>
-                </div>
-            </div>
 
-            {/* アクションボタン */}
-            <div className={styles.actionButtons}>
-                <button
-                    className={`${styles.actionButton} ${styles.passButton}`}
-                    onClick={() => handleAction('pass')}
-                    disabled={isAnimating}
-                >
-                    <span className={styles.actionIcon}>✕</span>
+                        <div className={styles.actionRing}>
+                            <button
+                                type="button"
+                                className={`${styles.actionButton} ${styles.actionPass}`}
+                                onClick={() => handleAction('pass')}
+                                disabled={isAnimating}
+                            >
+                                ✕
+                            </button>
+                            <button
+                                type="button"
+                                className={`${styles.actionButton} ${styles.actionSuperLike}`}
+                                onClick={() => handleAction('superlike')}
+                                disabled={isAnimating}
+                            >
+                                ⚡
+                            </button>
+                            <button
+                                type="button"
+                                className={`${styles.actionButton} ${styles.actionLike}`}
+                                onClick={() => handleAction('like')}
+                                disabled={isAnimating}
+                            >
+                                ♥
+                            </button>
+                        </div>
+
+                        <div className={styles.progressContainer}>
+                            <div className={styles.progressBar}>
+                                <div className={styles.progressFill} style={{ width: `${progressValue}%` }} />
+                            </div>
+                            <span className={styles.progressText}>
+                                {currentIndex + 1} / {restaurants.length}
+                            </span>
+                        </div>
+                    </section>
+                )}
+            </main>
+
+            <nav className={styles.bottomNav} aria-label="メインナビゲーション">
+                <button type="button" className={styles.navButton}>
+                    <span className={styles.navIcon}>🏠</span>
+                    <span className={styles.navLabel}>ホーム</span>
                 </button>
-
-                <button
-                    className={`${styles.actionButton} ${styles.superlikeButton}`}
-                    onClick={() => handleAction('superlike')}
-                    disabled={isAnimating}
-                >
-                    <span className={styles.actionIcon}>⭐</span>
+                <button type="button" className={`${styles.navButton} ${styles.navButtonActive}`}>
+                    <span className={styles.navIcon}>🧭</span>
+                    <span className={styles.navLabel}>ディスカバー</span>
                 </button>
-
-                <button
-                    className={`${styles.actionButton} ${styles.likeButton}`}
-                    onClick={() => handleAction('like')}
-                    disabled={isAnimating}
-                >
-                    <span className={styles.actionIcon}>♥</span>
+                <button type="button" className={styles.navButton}>
+                    <span className={styles.navIcon}>👦</span>
+                    <span className={styles.navLabel}>みんなの声</span>
                 </button>
-            </div>
-
-            {/* プログレスインジケーター */}
-            <div className={styles.progressContainer}>
-                <div className={styles.progressBar}>
-                    <div
-                        className={styles.progressFill}
-                        style={{ width: `${((currentIndex + 1) / restaurants.length) * 100}%` }}
-                    ></div>
-                </div>
-                <span className={styles.progressText}>
-                    {currentIndex + 1} / {restaurants.length}
-                </span>
-            </div>
+                <button type="button" className={styles.navButton}>
+                    <span className={styles.navIcon}>👤</span>
+                    <span className={styles.navLabel}>マイページ</span>
+                </button>
+            </nav>
         </div>
     );
 }

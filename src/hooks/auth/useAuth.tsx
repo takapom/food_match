@@ -29,6 +29,8 @@ function setAuthTokenCookie(token: string) {
 function clearAuthTokenCookie() {
     if (typeof document === 'undefined') return;
     document.cookie = `${AUTH_COOKIE_NAME}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax; Secure`;
+
+    console.log("Cookie after clearing：", document.cookie)
 }
 
 export const useLogin = () => {
@@ -77,6 +79,10 @@ export const useLogin = () => {
         clearAuthTokenCookie();
         setToken(null);
     };
+
+    useEffect(() => {
+        console.log("Updated token:", token);
+    }, [token]);
 
     return {
         login,

@@ -1,107 +1,113 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import styles from "./page.module.css";
-import HeaderNavigation from "@/components/profile/HeaderNavigation/HeaderNavigation";
-import ProfileSection from "@/components/profile/ProfileSection/ProfileSection";
 import BottomNavigation from "@/components/profile/BottomNavigation/BottomNavigation";
 import CreateVideoCard from "@/components/profile/CreateVideoCard/CreateVideoCard";
-import LoadingSpinner from "@/components/ui/LoadingSpinner/LoadingSpinner";
+import HeaderNavigation from "@/components/profile/HeaderNavigation/HeaderNavigation";
+import ProfileSection from "@/components/profile/ProfileSection/ProfileSection";
 import Button from "@/components/ui/Button/Button";
-import { formatDate } from "@/utils";
-import { useUser } from "@/hooks/auth/useUser";
 import { mockRootProps } from "./userProfileMockData";
-import Link from "next/link";
+import { useLogin } from "@/hooks/auth/useAuth";
+import { useRouter } from "next/navigation";
 
-const AUTH_COOKIE_NAME = process.env.NEXT_PUBLIC_AUTH_COOKIE_NAME || "auth_token";
+type InfoRow = {
+    label: string;
+    value: string;
+};
 
-//後々これを再利用できるようにする
-function getCookie(name: string): string | null {
-    if (typeof document === "undefined") return null;
-    const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
-    return match ? decodeURIComponent(match[1]) : null;
-}
+const highlightChips = ["プレミアム会員", "レビュー 48件", "お気に入り 120件"];
+
+const dummyProfileUser = {
+    ...mockRootProps.user,
+    username: "guest_user",
+    displayName: "ゲストユーザー",
+    followingCount: 12,
+    followersCount: 34,
+    likesCount: 56
+};
+
+const dummyInfoRows: InfoRow[] = [
+    { label: "ユーザー名", value: `@${dummyProfileUser.username}` },
+    { label: "メール", value: "guest@example.com" },
+    { label: "登録日", value: "2024/01/01" }
+];
 
 export default function UserProfilePage() {
-    const { user, loading, fetchUserProfile, logout } = useUser();
-    const [mounted, setMounted] = useState(false);
+    const headerName = dummyProfileUser.displayName;
+    const { logout } = useLogin();
+    const router = useRouter();
 
-    // Ensure first client render matches server HTML to avoid hydration mismatch
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-
-    // Fetch actual profile only after mount
-    useEffect(() => {
-        if (!mounted) return;
-        if (user) return
-        const token = getCookie(AUTH_COOKIE_NAME);
-        if (token) fetchUserProfile(token);
-    }, [mounted, user, fetchUserProfile]);
-
-    const safeUser = mounted && user ? user : null;
-
-    const headerName = safeUser?.displayName || mockRootProps.user.displayName;
-
-    const profileUser = safeUser
-        ? {
-            username: safeUser.username || mockRootProps.user.username,
-            displayName: safeUser.displayName || mockRootProps.user.displayName,
-            avatar: safeUser.avatar || "/images/profile-avatar.png",
-            followingCount: safeUser.followingCount ?? mockRootProps.user.followingCount,
-            followersCount: safeUser.followersCount ?? mockRootProps.user.followersCount,
-            likesCount: safeUser.likesCount ?? mockRootProps.user.likesCount,
-            hasBio: safeUser.hasBio ?? mockRootProps.user.hasBio,
-        }
-        : mockRootProps.user;
+    const handleLogout = () => {
+        logout();
+        router.push("/login")
+    };
 
     return (
-        <div className={styles.page}>
+        <div className={styles.appShell}>
+            <div className={styles.backgroundGlowPrimary} />
+            <div className={styles.backgroundGlowSecondary} />
+
             <HeaderNavigation displayName={headerName} />
 
-            <main className={styles.main}>
-                {loading && mounted ? (
-                    <div className={styles.section}>
-                        <LoadingSpinner />
+            <main className={styles.mainContent}>
+                <section className={styles.heroSection}>
+                    <h1 className={styles.heroTitle}>プロフィール</h1>
+                    <div className={styles.heroChips}>
+                        {highlightChips.map((chip) => (
+                            <span key={chip} className={styles.heroChip}>
+                                {chip}
+                            </span>
+                        ))}
                     </div>
-                ) : (
-                    <>
-                        <ProfileSection user={profileUser} />
+                </section>
 
-                        <section className={styles.section}>
-                            <h2 className={styles.sectionTitle}>基本情報</h2>
-                            {safeUser ? (
-                                <div className={styles.infoList}>
-                                    <div className={styles.infoItem}>
-                                        <span className={styles.infoLabel}>ユーザー名</span>
-                                        <span className={styles.infoValue}>@{profileUser.username}</span>
-                                    </div>
-                                    <div className={styles.infoItem}>
-                                        <span className={styles.infoLabel}>メール</span>
-                                        <span className={styles.infoValue}>{safeUser.email}</span>
-                                    </div>
-                                    <div className={styles.infoItem}>
-                                        <span className={styles.infoLabel}>登録日</span>
-                                        <span className={styles.infoValue}>{formatDate(safeUser.createdAt)}</span>
-                                    </div>
+                <section className={styles.profilePanel}>
+                    <div className={styles.profileHeader}>
+                        <ProfileSection user={dummyProfileUser} />
+                    </div>
 
-                                    <div className={styles.actions}>
-                                        <Button variant="ghost" onClick={logout}>ログアウト</Button>
-                                    </div>
+                    <div className={styles.quickStats}>
+                        <div className={styles.statCard}>
+                            <span className={styles.statLabel}>フォロー中</span>
+                            <strong className={styles.statValue}>{dummyProfileUser.followingCount}</strong>
+                        </div>
+                        <div className={styles.statCard}>
+                            <span className={styles.statLabel}>フォロワー</span>
+                            <strong className={styles.statValue}>{dummyProfileUser.followersCount}</strong>
+                        </div>
+                        <div className={styles.statCard}>
+                            <span className={styles.statLabel}>いいね</span>
+                            <strong className={styles.statValue}>{dummyProfileUser.likesCount}</strong>
+                        </div>
+                    </div>
+
+                    <div className={styles.infoCard}>
+                        <div className={styles.infoCardHeader}>
+                            <span className={styles.infoBadge}>ACCOUNT</span>
+                            <h2 className={styles.infoTitle}>アカウント情報</h2>
+                            <p className={styles.infoSubtitle}>プロフィールの基本情報を確認できます。</p>
+                        </div>
+
+                        <div className={styles.infoList}>
+                            {dummyInfoRows.map((row) => (
+                                <div key={row.label} className={styles.infoRow}>
+                                    <span className={styles.infoLabel}>{row.label}</span>
+                                    <span className={styles.infoValue}>{row.value}</span>
                                 </div>
-                            ) : (
-                                <div className={styles.emptyState}>
-                                    ログインするとプロフィールが表示されます。
-                                    <div className={styles.actions}>
-                                        <Link href="/login">
-                                            <Button>ログインへ</Button>
-                                        </Link>
-                                    </div>
-                                </div>
-                            )}
-                        </section>
-                    </>
-                )}
+                            ))}
+
+                            <div className={styles.infoActions}>
+                                <button
+                                    className={styles.richLogoutButton}
+                                    onClick={handleLogout}
+                                >
+                                    <span className={styles.logoutIcon}>🚪</span>
+                                    <span className={styles.logoutText}>ログアウト</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </main>
 
             <CreateVideoCard />

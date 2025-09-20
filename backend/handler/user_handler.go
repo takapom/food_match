@@ -16,7 +16,7 @@ func NewUserHandler(users repository.UserRepository) *UserHandler {
     return &UserHandler{users: users}
 }
 
-// Profile handles GET (fetch my profile) and PUT (update my profile)
+
 func (h *UserHandler) Profile(w http.ResponseWriter, r *http.Request) {
     switch r.Method {
     case http.MethodGet:

@@ -1,11 +1,4 @@
 curl -X POST http://localhost:8080/api/login \
--H "Content-Type: application/json" \
--d '{
-  "user_id": "144b62da-8a5a-4089-865d-e9c0a1c3c2a1",
-  "password": "password"
-}'
-
-curl -X POST http://localhost:8080/api/login \
  -H "Content-Type: application/json" \
  -d '{"email":"test@example.com","password":"password123"}'
 

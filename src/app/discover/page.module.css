@@ -4,9 +4,10 @@
   padding: calc(env(safe-area-inset-top, 16px) + 24px)
     20px
     calc(env(safe-area-inset-bottom, 16px) + 140px);
-  background: radial-gradient(circle at 12% 20%, rgba(99, 102, 241, 0.16), transparent 58%),
-    radial-gradient(circle at 88% 14%, rgba(244, 114, 182, 0.18), transparent 60%),
-    linear-gradient(180deg, #f8faff 0%, #ffffff 100%);
+  background:
+    radial-gradient(circle at 16% 12%, rgba(233, 240, 255, 0.32), transparent 65%),
+    radial-gradient(circle at 84% 8%, rgba(217, 226, 255, 0.28), transparent 62%),
+    linear-gradient(180deg, var(--serena-bg-primary) 0%, var(--serena-surface) 46%, var(--serena-surface-strong) 100%);
   color: #0f172a;
   overflow: hidden;
   display: flex;
@@ -29,7 +30,7 @@
   height: 420px;
   top: -190px;
   left: -150px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.45) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(233, 240, 255, 0.58) 0%, transparent 70%);
 }
 
 .backgroundGlowSecondary {
@@ -37,7 +38,7 @@
   height: 360px;
   right: -160px;
   bottom: -140px;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.35) 0%, transparent 72%);
+  background: radial-gradient(circle, rgba(217, 226, 255, 0.5) 0%, transparent 72%);
 }
 
 .header {
@@ -167,10 +168,10 @@
   gap: 12px;
   padding: 10px 18px;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.84) 0%, rgba(236, 233, 255, 0.4) 100%);
-  box-shadow: 0 14px 30px rgba(79, 70, 229, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.65);
-  color: #1f2937;
+  border: 1px solid var(--serena-border);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(233, 240, 255, 0.62) 100%);
+  box-shadow: 0 14px 30px rgba(148, 163, 184, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  color: var(--serena-text-secondary);
   font-size: 0.8rem;
   font-weight: 600;
   backdrop-filter: blur(18px) saturate(140%);
@@ -194,14 +195,14 @@
 .filterButton:hover,
 .filterButton:focus-visible {
   transform: translateY(-1px);
-  border-color: rgba(79, 70, 229, 0.5);
-  box-shadow: 0 18px 36px rgba(79, 70, 229, 0.24);
+  border-color: rgba(153, 174, 255, 0.45);
+  box-shadow: 0 18px 36px rgba(148, 163, 184, 0.24);
   outline: none;
 }
 
 .filterButtonActive {
-  border-color: rgba(37, 99, 235, 0.62);
-  box-shadow: 0 22px 42px rgba(37, 99, 235, 0.28);
+  border-color: rgba(132, 150, 255, 0.5);
+  box-shadow: 0 22px 42px rgba(148, 163, 184, 0.26);
 }
 
 .filterButtonIcon {
@@ -246,9 +247,9 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: rgba(15, 23, 42, 0.42);
-  backdrop-filter: blur(22px) saturate(150%);
-  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  background: rgba(15, 23, 42, 0.14);
+  backdrop-filter: blur(22px) saturate(120%);
+  -webkit-backdrop-filter: blur(22px) saturate(120%);
   z-index: 40;
 }
 
@@ -257,9 +258,9 @@
   width: min(420px, 92vw);
   border-radius: 28px;
   padding: 28px;
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.92) 0%, rgba(229, 231, 255, 0.68) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  box-shadow: 0 32px 60px rgba(30, 64, 175, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.98) 0%, rgba(242, 246, 255, 0.88) 100%);
+  border: 1px solid rgba(221, 229, 255, 0.82);
+  box-shadow: 0 26px 52px rgba(148, 163, 184, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.65);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
 }
@@ -284,7 +285,7 @@
   width: 44px;
   height: 44px;
   border-radius: 16px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(14, 165, 233, 0.18));
+  background: linear-gradient(135deg, rgba(217, 226, 255, 0.85), rgba(233, 240, 255, 0.6));
   font-size: 1.1rem;
 }
 
@@ -339,10 +340,10 @@
   gap: 6px;
   padding: 16px 18px;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(224, 231, 255, 0.45));
-  box-shadow: 0 18px 34px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  color: #111827;
+  border: 1px solid rgba(221, 229, 255, 0.78);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.97), rgba(242, 246, 255, 0.74));
+  box-shadow: 0 18px 34px rgba(148, 163, 184, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  color: var(--serena-text-primary);
   cursor: pointer;
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
   appearance: none;
@@ -352,15 +353,15 @@
 .filterOption:hover,
 .filterOption:focus-visible {
   transform: translateY(-2px);
-  box-shadow: 0 22px 40px rgba(79, 70, 229, 0.28);
-  border-color: rgba(79, 70, 229, 0.45);
+  box-shadow: 0 22px 40px rgba(148, 163, 184, 0.28);
+  border-color: rgba(153, 174, 255, 0.42);
   outline: none;
 }
 
 .filterOptionSelected {
-  border-color: rgba(79, 70, 229, 0.62);
-  box-shadow: 0 26px 48px rgba(79, 70, 229, 0.3);
-  background: linear-gradient(135deg, rgba(224, 231, 255, 0.74), rgba(191, 219, 254, 0.5));
+  border-color: rgba(132, 150, 255, 0.5);
+  box-shadow: 0 26px 48px rgba(148, 163, 184, 0.26);
+  background: linear-gradient(135deg, rgba(233, 240, 255, 0.86), rgba(217, 226, 255, 0.62));
 }
 
 .filterOptionValue {
@@ -695,12 +696,13 @@
   gap: 8px;
   padding: 12px;
   border-radius: 26px;
-  background: rgba(15, 23, 42, 0.78);
-  box-shadow: 0 22px 42px rgba(15, 23, 42, 0.32);
-  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--serena-border);
+  box-shadow: 0 18px 36px rgba(148, 163, 184, 0.18);
+  color: var(--serena-text-secondary);
   z-index: 10;
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
 }
 
 .navButton {
@@ -720,8 +722,8 @@
 }
 
 .navButtonActive {
-  background: rgba(99, 102, 241, 0.22);
-  color: #f8fafc;
+  background: rgba(217, 226, 255, 0.7);
+  color: #3246a1;
 }
 
 .navIcon {

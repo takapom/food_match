@@ -3,6 +3,19 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* Serena palette */
+  --serena-bg-primary: #f5f5f5;
+  --serena-bg-secondary: #ffffff;
+  --serena-surface-muted: #f9fbff;
+  --serena-surface: #f2f6ff;
+  --serena-surface-strong: #e6ecff;
+  --serena-surface-pop: #d9e2ff;
+  --serena-text-primary: #000000;
+  --serena-text-secondary: #333333;
+  --serena-text-muted: #666666;
+  --serena-border: #dddddd;
+  --serena-accent: #eaa45d;
+  --serena-accent-hover: #dca662;
   
   /* Profile page specific colors */
   --profile-bg: #ffffff;

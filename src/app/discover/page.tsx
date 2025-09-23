@@ -1,9 +1,28 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import type { MouseEvent, TouchEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+    AccessTimeRounded,
+    AttachMoneyRounded,
+    BoltRounded,
+    ChatBubbleRounded,
+    CloseRounded,
+    ExploreRounded,
+    FavoriteRounded,
+    HomeRounded,
+    LocationOnRounded,
+    ManageSearchRounded,
+    PersonRounded,
+    PlaceRounded,
+    RamenDiningRounded,
+    RestaurantMenuRounded,
+    SentimentVeryDissatisfiedRounded,
+    TuneRounded
+} from '@mui/icons-material';
 import UserIcon from '@/components/ui/UserIcon/UserIcon';
 import { type Shop } from '@/lib/api/restaurants';
 import styles from './page.module.css';
@@ -18,7 +37,7 @@ type FilterOption = {
 type FilterConfig = {
     key: FilterKey;
     label: string;
-    icon: string;
+    icon: ReactNode;
     options: FilterOption[];
 };
 
@@ -26,7 +45,7 @@ const filterConfigs: FilterConfig[] = [
     {
         key: 'location',
         label: '現在地',
-        icon: '📍',
+        icon: <LocationOnRounded fontSize="inherit" />,
         options: [
             { value: '梅田', hint: '大型商業施設と夜景ディナーが楽しめる' },
             { value: '天王寺', hint: 'あべのハルカス周辺の多彩なグルメ' },
@@ -37,7 +56,7 @@ const filterConfigs: FilterConfig[] = [
     {
         key: 'availability',
         label: '営業状況',
-        icon: '🌙',
+        icon: <AccessTimeRounded fontSize="inherit" />,
         options: [
             { value: 'OPEN NOW', hint: '今すぐ入店できるお店' },
             { value: '予約受付中', hint: '当日予約可能なレストラン' },
@@ -47,7 +66,7 @@ const filterConfigs: FilterConfig[] = [
     {
         key: 'budget',
         label: '予算',
-        icon: '💴',
+        icon: <AttachMoneyRounded fontSize="inherit" />,
         options: [
             { value: '1,000円', hint: 'サクッと立ち寄れるワンコイン＋α' },
             { value: '3,000円', hint: 'デイリーに使えるちょっと贅沢ライン' },
@@ -59,7 +78,7 @@ const filterConfigs: FilterConfig[] = [
 type SwipeAction = 'pass' | 'like' | 'superlike';
 
 type StateCardOptions = {
-    icon: string;
+    icon: ReactNode;
     title: string;
     message: string;
     actionLabel?: string;
@@ -130,7 +149,15 @@ export default function Discover() {
     const loadRestaurants = async () => {
         try {
             setLoading(true);
-            const response = await fetch('/api/restaurants?count=10');
+            const selectionLocation = filterSelections.location;
+            const queryParams = new URLSearchParams({
+                count: '10',
+                keyword: selectionLocation, // ←日本語をそのまま検索語に
+            });
+
+            const response = await fetch(`/api/restaurants?${queryParams.toString()}`);
+            console.log({ response })
+            // const response = await fetch('/api/restaurants?count=10');
 
             if (!response.ok) {
                 throw new Error('データの取得に失敗しました');
@@ -297,7 +324,9 @@ export default function Discover() {
 
             <header className={styles.header}>
                 <div className={styles.branding}>
-                    <span className={styles.brandIcon}>🍣</span>
+                    <span className={styles.brandIcon}>
+                        <RamenDiningRounded fontSize="inherit" />
+                    </span>
                     <div className={styles.brandText}>
                         <span className={styles.brandLabel}>Food Matching</span>
                         <span className={styles.brandSubtitle}>近くのおすすめを発見</span>
@@ -305,7 +334,7 @@ export default function Discover() {
                 </div>
                 <div className={styles.headerActions}>
                     <button type="button" className={styles.headerButton}>
-                        <span className={styles.headerButtonIcon}>⚙️</span>
+                        <TuneRounded className={styles.headerButtonIcon} fontSize="inherit" />
                     </button>
                     <UserIcon size="medium" />
                 </div>
@@ -374,7 +403,7 @@ export default function Discover() {
                                         onClick={() => setActiveFilter(null)}
                                         aria-label="フィルターを閉じる"
                                     >
-                                        ✕
+                                        <CloseRounded fontSize="small" />
                                     </button>
                                 </div>
                                 <div className={styles.filterOptions}>
@@ -401,14 +430,14 @@ export default function Discover() {
 
                 {loading &&
                     renderStateCard({
-                        icon: '🍽️',
+                        icon: <RestaurantMenuRounded fontSize="inherit" />,
                         title: '候補を探索中',
                         message: '美味しいお店を見つけています…'
                     })}
 
                 {!loading && error &&
                     renderStateCard({
-                        icon: '😞',
+                        icon: <SentimentVeryDissatisfiedRounded fontSize="inherit" />,
                         title: '読み込みに失敗しました',
                         message: '通信環境をご確認のうえ、もう一度お試しください。',
                         actionLabel: '再読み込み',
@@ -417,7 +446,7 @@ export default function Discover() {
 
                 {!loading && !error && !hasRestaurants &&
                     renderStateCard({
-                        icon: '🔍',
+                        icon: <ManageSearchRounded fontSize="inherit" />,
                         title: '近くに候補が見つかりません',
                         message: '条件をゆるめるか、別のエリアを試してみましょう。',
                         actionLabel: '再検索',
@@ -449,7 +478,9 @@ export default function Discover() {
                                                 <h2 className={styles.restaurantName}>{upcomingRestaurant.name}</h2>
                                                 <div className={styles.restaurantDetails}>
                                                     <div className={styles.detailItem}>
-                                                        <span className={styles.detailIcon}>📍</span>
+                                                        <span className={styles.detailIcon}>
+                                                            <PlaceRounded fontSize="inherit" />
+                                                        </span>
                                                         <span className={styles.detailText}>{upcomingRestaurant.access}</span>
                                                     </div>
                                                 </div>
@@ -504,7 +535,9 @@ export default function Discover() {
                                                 <h2 className={styles.restaurantName}>{activeRestaurant.name}</h2>
                                                 <div className={styles.restaurantDetails}>
                                                     <div className={styles.detailItem}>
-                                                        <span className={styles.detailIcon}>📍</span>
+                                                        <span className={styles.detailIcon}>
+                                                            <PlaceRounded fontSize="inherit" />
+                                                        </span>
                                                         <span className={styles.detailText}>{activeRestaurant.access}</span>
                                                     </div>
                                                     {activeRestaurant.catch && (
@@ -525,7 +558,7 @@ export default function Discover() {
                                 onClick={() => handleAction('pass')}
                                 disabled={isAnimating}
                             >
-                                ✕
+                                <CloseRounded fontSize="medium" />
                             </button>
                             <button
                                 type="button"
@@ -533,7 +566,7 @@ export default function Discover() {
                                 onClick={() => handleAction('superlike')}
                                 disabled={isAnimating}
                             >
-                                ⚡
+                                <BoltRounded fontSize="medium" />
                             </button>
                             <button
                                 type="button"
@@ -541,7 +574,7 @@ export default function Discover() {
                                 onClick={() => handleAction('like')}
                                 disabled={isAnimating}
                             >
-                                ♥
+                                <FavoriteRounded fontSize="medium" />
                             </button>
                         </div>
 
@@ -559,19 +592,27 @@ export default function Discover() {
 
             <nav className={styles.bottomNav} aria-label="メインナビゲーション">
                 <button type="button" className={styles.navButton}>
-                    <span className={styles.navIcon}>🏠</span>
+                    <span className={styles.navIcon}>
+                        <HomeRounded fontSize="inherit" />
+                    </span>
                     <span className={styles.navLabel}>ホーム</span>
                 </button>
                 <button type="button" className={`${styles.navButton} ${styles.navButtonActive}`}>
-                    <span className={styles.navIcon}>🧭</span>
+                    <span className={styles.navIcon}>
+                        <ExploreRounded fontSize="inherit" />
+                    </span>
                     <span className={styles.navLabel}>ディスカバー</span>
                 </button>
                 <button type="button" className={styles.navButton}>
-                    <span className={styles.navIcon}>👦</span>
+                    <span className={styles.navIcon}>
+                        <ChatBubbleRounded fontSize="inherit" />
+                    </span>
                     <span className={styles.navLabel}>みんなの声</span>
                 </button>
                 <button type="button" className={styles.navButton}>
-                    <span className={styles.navIcon}>👤</span>
+                    <span className={styles.navIcon}>
+                        <PersonRounded fontSize="inherit" />
+                    </span>
                     <span className={styles.navLabel}>マイページ</span>
                 </button>
             </nav>

@@ -11,13 +11,13 @@ export default function Header() {
             </Link>
           </div>
           <div className="flex items-center space-x-4">
-            <Link 
-              href="/login" 
+            <Link
+              href="/login"
               className="text-sm font-medium hover:text-gray-600 dark:hover:text-gray-300"
             >
               Login
             </Link>
-            <Link 
+            <Link
               href="/register"
               className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
             >

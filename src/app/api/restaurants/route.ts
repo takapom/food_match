@@ -139,11 +139,12 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const area = searchParams.get('area');
     const genre = searchParams.get('genre');
+    const keyword = searchParams.get('keyword');
     const count = searchParams.get('count') || '10';
     const start = searchParams.get('start') || '1';
 
     const apiKey = process.env.HOTPEPPER_API_KEY;
-    
+
     if (!apiKey) {
       throw new Error('HOTPEPPER_API_KEY is not configured');
     }
@@ -170,6 +171,11 @@ export async function GET(request: NextRequest) {
       queryParams.genre = GENRE_CODES[genre];
     }
 
+    // キーワード指定
+    if (keyword) {
+      queryParams.keyword = keyword;
+    }
+
     const queryString = new URLSearchParams(queryParams).toString();
     const hotpepperUrl = `https://webservice.recruit.co.jp/hotpepper/gourmet/v1/?${queryString}`;
 
@@ -187,7 +193,7 @@ export async function GET(request: NextRequest) {
     }
 
     const data: HotpepperResponse = await response.json();
-    
+
     if (!data.results || !data.results.shop) {
       throw new Error('Invalid response format from Hotpepper API');
     }
@@ -195,12 +201,12 @@ export async function GET(request: NextRequest) {
     // 空の結果でもそのまま返す（エラーにしない）
     console.log(`Found ${data.results.shop.length} restaurants from Hotpepper API`);
     return NextResponse.json(data.results.shop);
-    
+
   } catch (error) {
     console.error('Error fetching restaurants:', error);
-    
+
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to fetch restaurants',
         message: error instanceof Error ? error.message : 'Unknown error'
       },

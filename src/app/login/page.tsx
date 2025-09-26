@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLogin } from '@/hooks/auth/useAuth';
@@ -8,17 +8,12 @@ import styles from './page.module.css';
 
 const heroHighlights = ['AIレコメンド', 'スワイプ操作', '限定クーポン'];
 
-const socialProviders = [
-  { id: 'google', label: 'Google で続行', icon: '🔍' },
-  { id: 'apple', label: 'Apple で続行', icon: '' }
-];
-
 export default function LoginPage() {
   const router = useRouter();
+  const { login, loading, error, isAuthenticated } = useLogin();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const { login, loading, error, isAuthenticated } = useLogin();
   const [showError, setShowError] = useState(false);
 
   useEffect(() => {
@@ -33,10 +28,10 @@ export default function LoginPage() {
     }
   }, [isAuthenticated, router]);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const result = await login(email, password);
-    if (result) {
+    const ok = await login(email, password);
+    if (ok) {
       router.push('/discover');
       return;
     }
@@ -135,14 +130,13 @@ export default function LoginPage() {
             <span>または</span>
           </div>
 
-          <div className={styles.socialButtons}>
-            {socialProviders.map((provider) => (
-              <button key={provider.id} type="button" className={styles.socialButton}>
-                <span className={styles.socialIcon}>{provider.icon}</span>
-                {provider.label}
-              </button>
+          <ul className={styles.heroHighlights}>
+            {heroHighlights.map((text) => (
+              <li key={text} className={styles.heroHighlight}>
+                {text}
+              </li>
             ))}
-          </div>
+          </ul>
 
           <p className={styles.signupPrompt}>
             アカウントをお持ちでない方は{' '}

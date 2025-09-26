@@ -121,8 +121,8 @@ export default function Home() {
         </div> */}
 
         <div className={styles.ctaSection}>
-          <Link href="/login" className={`${styles.ctaButton} ${styles.primaryButton}`}>
-            ログイン
+          <Link href="/signup" className={`${styles.ctaButton} ${styles.primaryButton}`}>
+            始める
           </Link>
         </div>
 

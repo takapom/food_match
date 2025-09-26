@@ -125,6 +125,13 @@ export default function Discover() {
     const loadRestaurants = useCallback(async () => {
         try {
             setLoading(true);
+
+            const token = getAuthTokenFromCookie();
+            if (!token) {
+                router.push('/login');
+                return;
+            }
+
             const selectionLocation = filterSelections.location;
             const queryParams = new URLSearchParams({
                 count: '10',
@@ -156,7 +163,7 @@ export default function Discover() {
         } finally {
             setLoading(false);
         }
-    }, [filterSelections.location]);
+    }, [filterSelections.location, getAuthTokenFromCookie, router]);
 
     useEffect(() => {
         void loadRestaurants();

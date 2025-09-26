@@ -5,7 +5,6 @@ import BottomNavigation from "@/components/profile/BottomNavigation/BottomNaviga
 import CreateVideoCard from "@/components/profile/CreateVideoCard/CreateVideoCard";
 import HeaderNavigation from "@/components/profile/HeaderNavigation/HeaderNavigation";
 import ProfileSection from "@/components/profile/ProfileSection/ProfileSection";
-import Button from "@/components/ui/Button/Button";
 import { mockRootProps } from "./userProfileMockData";
 import { useLogin } from "@/hooks/auth/useAuth";
 import { useRouter } from "next/navigation";

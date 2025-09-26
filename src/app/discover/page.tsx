@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import type { MouseEvent, TouchEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import {
     AccessTimeRounded,
     AttachMoneyRounded,
@@ -40,6 +41,9 @@ type FilterConfig = {
     icon: ReactNode;
     options: FilterOption[];
 };
+
+const FALLBACK_RESTAURANT_IMAGE =
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400'%3E%3Crect width='600' height='400' fill='%23f2f2f2'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='32' fill='%23747474'%3ENo%20Image%3C/text%3E%3C/svg%3E";
 
 const filterConfigs: FilterConfig[] = [
     {
@@ -112,52 +116,22 @@ export default function Discover() {
         [activeFilter]
     );
 
-    useEffect(() => {
-        loadRestaurants();
-    }, []);
-
-    useEffect(() => {
-        const token = getAuthTokenFromCookie();
-        if (!token) {
-            router.push('/login');
-        }
-    }, [router]);
-
-    useEffect(() => {
-        setIsClient(true);
-    }, []);
-
-    useEffect(() => {
-        if (!isClient) return;
-        const body = document.body;
-        if (activeFilter) {
-            body.style.overflow = 'hidden';
-        } else {
-            body.style.overflow = '';
-        }
-        return () => {
-            body.style.overflow = '';
-        };
-    }, [activeFilter, isClient]);
-
-    const getAuthTokenFromCookie = () => {
+    const getAuthTokenFromCookie = useCallback(() => {
         if (typeof document === 'undefined') return null;
         const match = document.cookie.match(new RegExp(`(?:^|; )${AUTH_COOKIE_NAME}=([^;]*)`));
         return match ? decodeURIComponent(match[1]) : null;
-    };
+    }, [AUTH_COOKIE_NAME]);
 
-    const loadRestaurants = async () => {
+    const loadRestaurants = useCallback(async () => {
         try {
             setLoading(true);
             const selectionLocation = filterSelections.location;
             const queryParams = new URLSearchParams({
                 count: '10',
-                keyword: selectionLocation, // ←日本語をそのまま検索語に
+                keyword: selectionLocation,
             });
 
             const response = await fetch(`/api/restaurants?${queryParams.toString()}`);
-            console.log({ response })
-            // const response = await fetch('/api/restaurants?count=10');
 
             if (!response.ok) {
                 throw new Error('データの取得に失敗しました');
@@ -182,11 +156,39 @@ export default function Discover() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [filterSelections.location]);
 
-    const handleReload = () => {
-        loadRestaurants();
-    };
+    useEffect(() => {
+        void loadRestaurants();
+    }, [loadRestaurants]);
+
+    useEffect(() => {
+        const token = getAuthTokenFromCookie();
+        if (!token) {
+            router.push('/login');
+        }
+    }, [getAuthTokenFromCookie, router]);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
+
+    useEffect(() => {
+        if (!isClient) return;
+        const body = document.body;
+        if (activeFilter) {
+            body.style.overflow = 'hidden';
+        } else {
+            body.style.overflow = '';
+        }
+        return () => {
+            body.style.overflow = '';
+        };
+    }, [activeFilter, isClient]);
+
+    const handleReload = useCallback(() => {
+        void loadRestaurants();
+    }, [loadRestaurants]);
 
     const handleSelectFilter = (key: FilterKey, value: string) => {
         setFilterSelections((prev) => ({
@@ -201,7 +203,7 @@ export default function Discover() {
             setCurrentIndex((prev) => prev + 1);
             return;
         }
-        loadRestaurants();
+        void loadRestaurants();
     };
 
     const handleAction = (action: SwipeAction) => {
@@ -459,10 +461,17 @@ export default function Discover() {
                             {upcomingRestaurant && (
                                 <article className={`${styles.card} ${styles.cardSecondary}`}>
                                     <div className={styles.cardImageContainer}>
-                                        <img
-                                            src={upcomingRestaurant.photo.pc.l || upcomingRestaurant.photo.pc.m}
+                                        <Image
+                                            src={
+                                                upcomingRestaurant.photo.pc.l ||
+                                                upcomingRestaurant.photo.pc.m ||
+                                                FALLBACK_RESTAURANT_IMAGE
+                                            }
                                             alt={upcomingRestaurant.name}
+                                            fill
                                             className={styles.cardImage}
+                                            sizes="(max-width: 768px) 80vw, 30vw"
+                                            unoptimized
                                         />
                                         <div className={styles.cardGradient} />
                                         <div className={styles.cardOverlay}>
@@ -504,10 +513,18 @@ export default function Discover() {
                             >
                                 <div className={styles.cardSlide}>
                                     <div className={styles.cardImageContainer}>
-                                        <img
-                                            src={activeRestaurant.photo.pc.l || activeRestaurant.photo.pc.m}
+                                        <Image
+                                            src={
+                                                activeRestaurant.photo.pc.l ||
+                                                activeRestaurant.photo.pc.m ||
+                                                FALLBACK_RESTAURANT_IMAGE
+                                            }
                                             alt={activeRestaurant.name}
+                                            fill
                                             className={styles.cardImage}
+                                            sizes="(max-width: 768px) 80vw, 50vw"
+                                            priority
+                                            unoptimized
                                         />
                                         <div className={styles.cardGradient} />
 

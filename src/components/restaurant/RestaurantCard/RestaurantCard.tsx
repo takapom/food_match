@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import React from 'react';
 import styles from './RestaurantCard.module.css';
 import type { Shop } from '../../../lib/api/restaurants';
@@ -10,10 +11,13 @@ export default function RestaurantCard({ shop }: RestaurantCardProps) {
   return (
     <div className={styles.card}>
       <div className={styles.imageContainer}>
-        <img
+        <Image
           src={shop.photo.pc.l || shop.photo.pc.m || '/placeholder.jpg'}
           alt={shop.name}
+          fill
           className={styles.image}
+          sizes="(max-width: 768px) 100vw, 400px"
+          unoptimized
         />
       </div>
 

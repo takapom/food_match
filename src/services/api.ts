@@ -9,10 +9,10 @@ class ApiService {
     this.timeout = config.api.timeout;
   }
 
-  private async request<T>(
+  private async request<TResponse>(
     endpoint: string,
     options: RequestInit = {}
-  ): Promise<T> {
+  ): Promise<TResponse> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
@@ -26,16 +26,14 @@ class ApiService {
         },
       });
 
-      clearTimeout(timeoutId);
-
       if (!response.ok) {
         throw new Error(`API Error: ${response.statusText}`);
       }
 
-      return response.json();
-    } catch (error) {
+      const result = (await response.json()) as TResponse;
+      return result;
+    } finally {
       clearTimeout(timeoutId);
-      throw error;
     }
   }
 
@@ -43,15 +41,15 @@ class ApiService {
     return this.request<T>(endpoint, { method: "GET" });
   }
 
-  async post<T>(endpoint: string, data: any): Promise<T> {
-    return this.request<T>(endpoint, {
+  async post<TResponse, TBody>(endpoint: string, data: TBody): Promise<TResponse> {
+    return this.request<TResponse>(endpoint, {
       method: "POST",
       body: JSON.stringify(data),
     });
   }
 
-  async put<T>(endpoint: string, data: any): Promise<T> {
-    return this.request<T>(endpoint, {
+  async put<TResponse, TBody>(endpoint: string, data: TBody): Promise<TResponse> {
+    return this.request<TResponse>(endpoint, {
       method: "PUT",
       body: JSON.stringify(data),
     });

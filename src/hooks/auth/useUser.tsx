@@ -22,6 +22,10 @@ export const useUser = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  type ApiErrorResponse = {
+    message?: string;
+  };
+
   const fetchUserProfile = async (token: string): Promise<User | null> => {
     setLoading(true);
     setError(null);
@@ -35,16 +39,19 @@ export const useUser = () => {
         },
       });
 
+      const payload: User | ApiErrorResponse = await res.json();
+
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Failed to fetch user profile");
+        const apiError = (payload as ApiErrorResponse).message ?? "Failed to fetch user profile";
+        throw new Error(apiError);
       }
 
-      const userData: User = await res.json();
+      const userData = payload as User;
       setUser(userData);
       return userData;
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to fetch user profile";
+      setError(message);
       return null;
     } finally {
       setLoading(false);
@@ -65,16 +72,19 @@ export const useUser = () => {
         body: JSON.stringify(updates),
       });
 
+      const payload: User | ApiErrorResponse = await res.json();
+
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Failed to update user profile");
+        const apiError = (payload as ApiErrorResponse).message ?? "Failed to update user profile";
+        throw new Error(apiError);
       }
 
-      const updatedUser: User = await res.json();
+      const updatedUser = payload as User;
       setUser(updatedUser);
       return updatedUser;
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to update user profile";
+      setError(message);
       return null;
     } finally {
       setLoading(false);

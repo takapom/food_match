@@ -24,8 +24,9 @@ export class Database {
     console.log("Database disconnected");
   }
   
-  async query<T>(sql: string, params?: any[]): Promise<T[]> {
+  async query<T>(queryText: string, params: ReadonlyArray<unknown> = []): Promise<T[]> {
     // TODO: Implement database query
+    console.log("Database query called", { queryText, params });
     return [] as T[];
   }
 }

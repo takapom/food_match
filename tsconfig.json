@@ -36,6 +36,7 @@
     ".next/types/**/*.ts"
 , "src/hooks/auth/useAuth.tsz"  ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "supabase/docker"
   ]
 }

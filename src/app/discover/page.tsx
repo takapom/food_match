@@ -128,7 +128,7 @@ export default function Discover() {
 
             const token = getAuthTokenFromCookie();
             if (!token) {
-                router.push('/login');
+                router.replace('/login');
                 return;
             }
 
@@ -172,7 +172,7 @@ export default function Discover() {
     useEffect(() => {
         const token = getAuthTokenFromCookie();
         if (!token) {
-            router.push('/login');
+            router.replace('/login');
         }
     }, [getAuthTokenFromCookie, router]);
 

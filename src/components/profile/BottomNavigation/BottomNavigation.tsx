@@ -39,7 +39,7 @@ export default function BottomNavigation({ currentTab }: BottomNavigationProps) 
 
   const handleNav = (tab: string) => {
     const target = tabToPath[tab];
-    if (target && target !== pathname) router.push(target);
+    if (target && target !== pathname) router.replace(target);
   };
 
   return (

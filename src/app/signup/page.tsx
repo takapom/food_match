@@ -18,7 +18,7 @@ export default function SignupPage() {
   }, [error]);
 
   useEffect(() => {
-    if (isAuthenticated) router.push("/discover");
+    if (isAuthenticated) router.replace("/discover");
   }, [isAuthenticated, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,7 +26,7 @@ export default function SignupPage() {
     const ok = await signup(email, password);
     if (ok) {
       // サインアップ後に確認メールが来るケースがあるため案内してリダイレクトする
-      router.push("/discover");
+      router.replace("/discover");
     } else {
       setShowError(true);
     }

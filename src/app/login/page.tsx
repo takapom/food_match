@@ -24,7 +24,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push('/discover');
+      router.replace('/discover');
     }
   }, [isAuthenticated, router]);
 
@@ -32,7 +32,7 @@ export default function LoginPage() {
     event.preventDefault();
     const ok = await login(email, password);
     if (ok) {
-      router.push('/discover');
+      router.replace('/discover');
       return;
     }
     setShowError(true);

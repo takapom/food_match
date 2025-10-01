@@ -38,7 +38,7 @@ export default function UserProfilePage() {
 
     const handleLogout = () => {
         logout();
-        router.push("/login")
+        router.replace("/login")
     };
 
     return (

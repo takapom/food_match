@@ -1,9 +1,31 @@
 {
-    "python-envs.pythonProjects": [
-        {
-            "path": "backend/infrastructure/persistence",
-            "envManager": "ms-python.python:venv",
-            "packageManager": "ms-python.python:pip"
-        }
-    ]
+  "[typescript]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "deno.enablePaths": [
+    "supabase/functions"
+  ],
+  "deno.lint": true,
+  "deno.unstable": [
+    "bare-node-builtins",
+    "byonm",
+    "sloppy-imports",
+    "unsafe-proto",
+    "webgpu",
+    "broadcast-channel",
+    "worker-options",
+    "cron",
+    "kv",
+    "ffi",
+    "fs",
+    "http",
+    "net"
+  ],
+  "python-envs.pythonProjects": [
+    {
+      "envManager": "ms-python.python:venv",
+      "packageManager": "ms-python.python:pip",
+      "path": "backend/infrastructure/persistence"
+    }
+  ]
 }

@@ -106,3 +106,7 @@ export const useUser = () => {
     setUser,
   };
 };
+
+const a = 1;
+
+//変更したよ！！
